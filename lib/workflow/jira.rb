@@ -24,11 +24,15 @@ module Flow
       end
 
       def issue_url(issue, status_id)
-        "https://kodify.atlassian.net/rest/api/latest/issue/#{issue}/transitions\?expand\=transitions.fields\&transitionId\=#{status[status_id]}"
+        "#{config['jira']['url']}/rest/api/latest/issue/#{issue}/transitions\?expand\=transitions.fields\&transitionId\=#{status[status_id]}"
       end
 
       def data_for_move(status_id)
         "{\"transition\":{\"id\" : \"#{status[status_id]}\"}}"
+      end
+
+      def config
+        @__config__ ||= Flow::Config.get
       end
     end
   end

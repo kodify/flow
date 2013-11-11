@@ -15,6 +15,7 @@ parameters:
   jenkins:
     url: http://my_url:18181/job/
   jira:
+    url: https://you.atlassian.net
     user: api
     pass: my_jira_password
     transitions:

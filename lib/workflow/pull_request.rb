@@ -57,8 +57,12 @@ module Flow
 
       def merge
         message = "#{original_branch} #UAT-OK - PR #{number} merged"
-        response = client.merge_pull_request(repo.name, pull.number, message)
-        response['merged']
+        begin
+          response = client.merge_pull_request(repo.name, pull.number, message)
+          response['merged']
+        rescue
+          false
+        end
       end
 
       def delete_original_branch

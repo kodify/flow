@@ -1,4 +1,5 @@
 #Flow
+[![Build Status](https://travis-ci.org/kodify/flow.png?branch=master)](https://travis-ci.org/kodify/flow)
 
 Agile environment workflow assistant
 

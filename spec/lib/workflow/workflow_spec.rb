@@ -41,25 +41,31 @@ describe Flow::Workflow::Workflow do
 
   describe '#flow' do
 
-    let!(:repo_name)  { 'supu' }
-    let!(:all_prs)    { [ pr ] }
-    let!(:status)     { :success }
-    let!(:config)     { { 'flow' => { 'pending_pr_to_notify' => pending_pr } } }
-    let!(:pending_pr) { 10 }
-    let!(:client)     { double('client') }
-    let!(:notifier)   { double('notifier', say_processing: nil) }
+    let!(:repo_name)      { 'supu' }
+    let!(:all_prs)        { [ pr ] }
+    let!(:status)         { :success }
+    let!(:config)         { { 'flow' => { 'pending_pr_to_notify' => pending_pr, 'pending_pr_interval_in_sec' => interval } } }
+    let!(:interval)       { 1 }
+    let!(:pending_pr)     { 10 }
+    let!(:octokit_client) { double('octokit_client') }
+    let!(:notifier)       { double('notifier', say_processing: nil) }
     let!(:pr) do
-      double('pr', status: status, to_in_progress: true, to_uat: true, save_comments_to_be_discussed: true)
+      double('pr', {
+          status: status,
+          to_in_progress: true,
+          to_uat: true,
+          save_comments_to_be_discussed: true,
+      } )
     end
 
     before do
-      subject.stub(:all_prs).and_return all_prs
+      subject.stub(:open_pull_requests).and_return all_prs
       subject.stub(:big_build).and_return true
       subject.stub(:config).and_return config
-      subject.stub(:client).and_return client
+      subject.stub(:octokit_client).and_return octokit_client
       subject.stub(:notifier).and_return notifier
       subject.stub(:integrate_pull_request).and_return true
-      subject.stub(:notify_review).and_return true
+      subject.stub(:ask_for_reviews).and_return true
 
       subject.flow(repo_name)
     end
@@ -92,7 +98,7 @@ describe Flow::Workflow::Workflow do
       let!(:pending_pr) { 1 }
       let!(:status)     { :not_reviewed }
       it 'should ask for notify pull requests' do
-        subject.should have_received(:notify_review)
+        subject.should have_received(:ask_for_reviews)
       end
     end
 

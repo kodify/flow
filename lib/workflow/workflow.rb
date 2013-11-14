@@ -12,55 +12,40 @@ require File.join(File.dirname(__FILE__), '..', 'config')
 module Flow
   module Workflow
     class Workflow
-
       attr_accessor :__notifier__
 
       def initialize(thor_instance = nil)
         @thor = thor_instance
       end
 
-      ##
-      # Kodify workflow automation
-      #
       def flow(repo_name)
-        pending_pr_arr = []
+        @pr_to_be_reviewed = []
+        @repo_name = repo_name
 
-        all_prs(client, repo_name).each do |pr|
-
+        open_pull_requests.each do |pr|
           notifier.say_processing pr
-          if (pr.status == :success)
-            pr.save_comments_to_be_discussed
-            integrate_pull_request pr
-          elsif (pr.status == :uat_ko)
-            pr.to_in_progress jira
-          elsif (pr.status == :not_uat)
-            pr.to_uat jira
-          elsif (pr.status == :not_reviewed)
-            pending_pr_arr << pr
-          else
-            notifier.say_cant_merge pr
-          end
+          process_pull_request pr
         end
 
-        if pending_pr_arr.length >= config['flow']['pending_pr_to_notify']
-          notify_review repo_name, pending_pr_arr
-        end
-      end
-
-      def all_prs(client, repo_name)
-        Repo.new(client, repo_name).pull_requests
-      end
-
-      def client
-        @__client__ ||= begin
-          Octokit::Client.new(
-              :login    => config['github']['login'],
-              :password => config['github']['password']
-          )
-        end
+        ask_for_reviews
       end
 
       protected
+
+      def process_pull_request(pr)
+        if (pr.status == :success)
+          pr.save_comments_to_be_discussed
+          integrate_pull_request pr
+        elsif (pr.status == :uat_ko)
+          pr.to_in_progress jira
+        elsif (pr.status == :not_uat)
+          pr.to_uat jira
+        elsif (pr.status == :not_reviewed)
+          @pr_to_be_reviewed << pr
+        else
+          notifier.say_cant_merge pr
+        end
+      end
 
       def integrate_pull_request(pr)
         if pr.merge == false
@@ -81,30 +66,32 @@ module Flow
         jenkins.big_build project
       end
 
-      def notify_review(repo_name, pending_pr_arr)
+      def ask_for_reviews
+        return if !ask_for_reviews?
 
-        file_name   = '/tmp/flow_pending_pr_' + Digest::MD5.hexdigest(repo_name)
-        interval    =  get_last_notification_elapsed_time file_name
-        qty         = pending_pr_arr.length
+        qty     = @pr_to_be_reviewed.length
+        message = html_message = "There are #{qty} PR ready to be reviewed in #{@repo_name} repo:"
 
-        if interval > config['flow']['pending_pr_interval_in_sec']
-            File.open(file_name, 'w') {}
-
-            message         = "There are #{qty} PR ready to be reviewed in #{repo_name} repo:"
-            html_message    = "There are #{qty} PR ready to be reviewed in #{repo_name} repo:"
-            pending_pr_arr.each do |pr|
-                message += "\n  #{pr.original_branch} - https://github.com/#{repo_name}/pull/#{pr.number} "
-                html_message += "<br> - #{pr.original_branch} - <a href=\"https://github.com/#{repo_name}/pull/#{pr.number}\">https://github.com/#{repo_name}/pull/#{pr.number}</a>"
-            end
-
-            notifier.say html_message, :notify => true, :message_format => 'html'
+        @pr_to_be_reviewed.each do |pr|
+            message += "\n  #{pr.original_branch} - https://github.com/#{@repo_name}/pull/#{pr.number} "
+            html_message += "<br> - #{pr.original_branch} - <a href=\"https://github.com/#{repo_name}/pull/#{pr.number}\">https://github.com/#{@repo_name}/pull/#{pr.number}</a>"
         end
+
+        notifier.say html_message, :notify => true, :message_format => 'html'
       end
 
-      def get_last_notification_elapsed_time(file_path)
+      def ask_for_reviews?
+        return unless @pr_to_be_reviewed.length >= config['flow']['pending_pr_to_notify']
+        return unless ask_for_reviews_interval > config['flow']['pending_pr_interval_in_sec']
+
+        File.open(elapsed_time_file_name, 'w') {}
+        true
+      end
+
+      def ask_for_reviews_interval
         now = Time.now.utc
         begin
-          last_notification = File.mtime(file_path)
+          last_notification = File.mtime(elapsed_time_file_name)
         rescue
           last_notification = Time.now.utc - config['flow']['pending_pr_interval_in_sec'] - 1
         end
@@ -112,12 +99,29 @@ module Flow
         return now - last_notification
       end
 
+      def open_pull_requests
+        Repo.new(octokit_client, @repo_name).pull_requests
+      end
+
+      def octokit_client
+        @__octokit_client__ ||= begin
+          Octokit::Client.new(
+              :login    => config['github']['login'],
+              :password => config['github']['password']
+          )
+        end
+      end
+
+      def elapsed_time_file_name
+        @__file_name__ = '/tmp/flow_pending_pr_' + Digest::MD5.hexdigest(@repo_name)
+      end
+
       def notifier
         @__notifier__ ||= Flow::Workflow::Notifier.new @thor
       end
 
       def repo
-        @__repo__ ||= Repo.new(client, repo)
+        @__repo__ ||= Repo.new(octokit_client, repo)
       end
 
       def jira

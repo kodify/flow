@@ -1,6 +1,9 @@
 language: ruby
 rvm:
   - 2.0.0
+addons:
+    code_climate:
+        repo_token: e3897bea55758289e8e93e2674b26fdbb9f65429e127578ac78d1ff25cf3b69b
 before_script:
   - "cp config/parameters.yml.tpl config/parameters.yml"
 script:

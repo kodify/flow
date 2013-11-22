@@ -7,6 +7,7 @@ module Flow
 
     def self.get
       @__config__ ||= begin
+        return ENV['flow_config'] if ENV.include? 'flow_config'
         YAML::load_file(File.join(File.dirname(__FILE__), '../config/parameters.yml'))['parameters']
       end
     end

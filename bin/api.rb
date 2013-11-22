@@ -20,6 +20,10 @@ post'/pr/:issue/ok' do
   move_pr :ship_it!
 end
 
+get '/ping' do
+  'its alive'
+end
+
 
 helpers do
   def valid_deploy?(params)

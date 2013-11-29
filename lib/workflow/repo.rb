@@ -19,6 +19,19 @@ module Flow
         nil
       end
 
+      def issue_exists(issue_name)
+        issues.each do |issue|
+          return true if issue.title.include? issue_name
+        end
+        false
+      end
+
+      def issue!(title, body = '', options = {})
+        unless issue_exists(title)
+          client.create_issue(name, title, body, options)
+        end
+      end
+
       protected
 
       def pulls
@@ -27,6 +40,14 @@ module Flow
           pulls << PullRequest.new(client, self, pull)
         end
         pulls
+      end
+
+      def issues
+        issues = []
+        client.issues(name).each do |issue|
+          issues << issue
+        end
+        issues
       end
 
     end

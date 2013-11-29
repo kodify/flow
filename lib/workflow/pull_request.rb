@@ -83,8 +83,13 @@ module Flow
 
       def save_comments_to_be_discussed
         comments.each do |comment|
-          issue! 'To Discuss', comment.body if comment.body.include? ':exclamation:'
+          name = issue_id comment
+          repo.issue! "#{name}", "To Discuss : #{comment.body}", labels: 'to_discuss' if comment.body.include? ':exclamation:'
         end
+      end
+
+      def issue_id(comment)
+        "[#{original_branch}:#{comment.id}]"
       end
 
       def ship_it!
@@ -93,10 +98,6 @@ module Flow
 
       def boom_it!
         comment! dictionary['uat_ko'][0]
-      end
-
-      def issue!(title, body = '')
-        client.create_issue(repo.name, title, body, :labels => 'to_discuss')
       end
 
       def comment!(body)

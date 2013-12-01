@@ -3,6 +3,7 @@ require 'thor'
 
 require File.join(File.dirname(__FILE__), 'config')
 require File.join(File.dirname(__FILE__), 'workflow/jenkins')
+require File.join(File.dirname(__FILE__), 'workflow/workflow')
 
 def current_path
   @current_path ||= File.expand_path(File.dirname(__FILE__) + '/..')
@@ -19,8 +20,6 @@ kod flow <repo_name>
 
 E
   def flow(repo)
-    require File.join(File.dirname(__FILE__), 'workflow/workflow')
-
     workflow = Flow::Workflow::Workflow.new self
     workflow.flow repo
   end

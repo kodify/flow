@@ -13,43 +13,29 @@ module Flow
       end
 
       def pull_request_by_name(name)
-        pulls.each do |pr|
-          return pr if (pr.jira_id.to_s == name)
-        end
-        nil
+        pulls.find { |pull| pull.jira_id.to_s == name }
       end
-
+      
       def issue_exists(issue_name)
-        issues.each do |issue|
-          return true if issue.title.include? issue_name
-        end
-        false
+        issues.any? { |issue| issue.title.include? issue_name }
       end
 
       def issue!(title, body = '', options = {})
-        unless issue_exists(title)
-          client.create_issue(name, title, body, options)
-        end
+        return if issue_exists(title)
+        client.create_issue(name, title, body, options)
       end
 
       protected
 
       def pulls
-        pulls = []
-        client.pull_requests(name).each do |pull|
-          pulls << PullRequest.new(client, self, pull)
+        client.pull_request(name).map do |pull|
+          PullRequest.new(client, self, pull)
         end
-        pulls
       end
 
       def issues
-        issues = []
-        client.issues(name).each do |issue|
-          issues << issue
-        end
-        issues
+        client.issues(name)
       end
-
     end
   end
 end

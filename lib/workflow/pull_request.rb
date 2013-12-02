@@ -10,12 +10,11 @@ module Flow
       end
 
       def has_comment_with?(patterns)
-        patterns.each do |pattern|
-          return true if comments.any? { |s| s.body.include?(pattern) }
+        patterns.any? do |pattern|
+          comments.any? { |s| s.body.include?(pattern) }
         end
-        false
       end
-
+      
       def blocked?
         has_comment_with?(dictionary['blocked'])
       end
@@ -33,10 +32,9 @@ module Flow
       end
 
       def green?
-        client.statuses(repo.name, pull.head.attrs[:sha]).each do |state|
-          return true if state.attrs[:state] == 'success'
+        client.statuses(repo.name, sha).any? do |state|
+          state.attrs[:state] == 'success'
         end
-        false
       end
 
       def status
@@ -126,6 +124,9 @@ module Flow
         @__dictionary__ ||= Flow::Config.get['dictionary']
       end
 
+      def sha
+        pull.head.attrs[:sha]
+      end
     end
   end
 end

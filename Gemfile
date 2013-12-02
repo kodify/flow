@@ -18,7 +18,6 @@ gem 'hipchat'
 # Add dependencies to develop your gem here.
 # Include everything needed to run rake, tests, features, etc.
 group :development, :test do
-  gem 'debugger'
   gem "rspec"
   gem "shoulda", ">= 0"
   gem "rdoc", "~> 3.12"

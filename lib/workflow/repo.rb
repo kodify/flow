@@ -28,7 +28,7 @@ module Flow
       protected
 
       def pulls
-        client.pull_request(name).map do |pull|
+        client.pull_requests(name).map do |pull|
           PullRequest.new(client, self, pull)
         end
       end

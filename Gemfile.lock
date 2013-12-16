@@ -30,6 +30,7 @@ GEM
     json (1.8.0)
     json_pure (1.8.1)
     lockfile (2.1.0)
+    mime-types (1.25)
     minitest (4.7.5)
     multi_json (1.7.7)
     multi_xml (0.5.5)
@@ -45,6 +46,8 @@ GEM
     rake (10.1.0)
     rdoc (3.12.2)
       json (~> 1.4)
+    rest-client (1.6.7)
+      mime-types (>= 1.16)
     rspec (2.14.1)
       rspec-core (~> 2.14.0)
       rspec-expectations (~> 2.14.0)
@@ -101,6 +104,7 @@ DEPENDENCIES
   net-ssh
   octokit
   rdoc (~> 3.12)
+  rest-client (~> 1.6.7)
   rspec
   shoulda
   sinatra

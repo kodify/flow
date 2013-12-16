@@ -16,8 +16,10 @@ parameters:
     url: http://my_url:18181/job/
   jira:
     url: https://you.atlassian.net
+    issue_path: /browse/
     user: api
     pass: my_jira_password
+    min_unassigned_uats: 3
     transitions:
       ready_uat: id_ready_uat
       uat_nok: id_uat_ko

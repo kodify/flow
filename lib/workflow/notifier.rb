@@ -4,6 +4,8 @@ module Flow
   module Workflow
     class Notifier
 
+      attr_accessor :room
+
       def initialize(thor_instance)
         @thor = thor_instance
       end
@@ -72,7 +74,7 @@ module Flow
       end
 
       def room
-        config['room']
+        @room ||= config['room']
       end
 
       def client

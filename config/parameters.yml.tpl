@@ -2,6 +2,7 @@ parameters:
   hipchat:
     token: my_hipchat_token
     room: my_hipchat_room
+    uat_room: my_hipchat_room
     default_user: Mr Deploy
     days: 12345
     hours: 9-18

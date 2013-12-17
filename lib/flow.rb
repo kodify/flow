@@ -50,6 +50,7 @@ E
 
     if issues_unassigned_on_uat.length >= config['jira']['min_unassigned_uats']
       html_message = "There are #{issues_unassigned_on_uat.length} PR ready to be uated in #{@repo_name} repo: #{html_message}"
+      notifier.room = config['hipchat']['uat_room']
       notifier.say html_message, :notify => true, :message_format => 'html'
     end
   end

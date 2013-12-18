@@ -16,7 +16,7 @@ post '/pr/:issue/ko' do
   move_pr :boom_it!
 end
 
-post'/pr/:issue/ok' do
+post '/pr/:issue/ok' do
   move_pr :ship_it!
 end
 
@@ -52,7 +52,7 @@ helpers do
   def github_client
     @__github_client__ ||= begin
       workflow = Flow::Workflow::Workflow.new
-      workflow.client
+      workflow.octokit_client
     end
   end
 

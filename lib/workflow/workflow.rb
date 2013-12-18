@@ -30,6 +30,15 @@ module Flow
         ask_for_reviews
       end
 
+      def octokit_client
+        @__octokit_client__ ||= begin
+          Octokit::Client.new(
+              :login    => config['github']['login'],
+              :password => config['github']['password']
+          )
+        end
+      end
+
       protected
 
       def process_pull_request(pr)
@@ -101,15 +110,6 @@ module Flow
 
       def open_pull_requests
         Repo.new(octokit_client, @repo_name).pull_requests
-      end
-
-      def octokit_client
-        @__octokit_client__ ||= begin
-          Octokit::Client.new(
-              :login    => config['github']['login'],
-              :password => config['github']['password']
-          )
-        end
       end
 
       def elapsed_time_file_name

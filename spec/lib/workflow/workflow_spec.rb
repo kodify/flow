@@ -4,7 +4,7 @@ require File.join(@@base_path, 'lib', 'workflow', 'workflow')
 describe Flow::Workflow::Workflow do
 
   describe '#integrate_pull_request' do
-    let!(:pr)       { double('pr', merge: merge, to_done: nil, delete_original_branch: nil) }
+    let!(:pr)       { double('pr', merge: merge, to_done: nil, delete_original_branch: nil, ignore: false) }
     let!(:notifier) { double('notifier', say_merged: nil, say_big_build_queued: nil, say_cant_merge: nil) }
     let!(:merge)    { true }
 
@@ -49,12 +49,14 @@ describe Flow::Workflow::Workflow do
     let!(:pending_pr)     { 10 }
     let!(:octokit_client) { double('octokit_client') }
     let!(:notifier)       { double('notifier', say_processing: nil) }
+    let!(:ignore)         { false }
     let!(:pr) do
       double('pr', {
           status: status,
           to_in_progress: true,
           to_uat: true,
           save_comments_to_be_discussed: true,
+          ignore: ignore,
       } )
     end
 
@@ -98,6 +100,15 @@ describe Flow::Workflow::Workflow do
       let!(:pending_pr) { 1 }
       let!(:status)     { :not_reviewed }
       it 'should ask for notify pull requests' do
+        subject.should have_received(:ask_for_reviews)
+      end
+    end
+
+    describe 'for a to be ignored pull request' do
+      let!(:pending_pr) { 1 }
+      let!(:status)     { :not_reviewed }
+      let!(:ignore)         { true }
+      it 'should not ask for notify pull requests' do
         subject.should have_received(:ask_for_reviews)
       end
     end

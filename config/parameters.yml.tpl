@@ -30,3 +30,4 @@ parameters:
     reviewed: [ ':+1:', '+1' ]
     uat_ok: [ ':shipit:', '[UAT-OK]' ]
     uat_ko: [ ':boom:', '[UAT-KO]' ]
+    ignore: [ '[IGNORE]' ]

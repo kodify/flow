@@ -124,6 +124,10 @@ module Flow
         @__dictionary__ ||= Flow::Config.get['dictionary']
       end
 
+      def ignore
+        pull.title.include? dictionary['ignore']
+      end
+
       def sha
         pull.head.attrs[:sha]
       end

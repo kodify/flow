@@ -20,6 +20,7 @@ gem "rest-client", "~> 1.6.7"
 # Add dependencies to develop your gem here.
 # Include everything needed to run rake, tests, features, etc.
 group :development, :test do
+  gem "byebug"
   gem "rspec"
   gem "shoulda", ">= 0"
   gem "rdoc", "~> 3.12"

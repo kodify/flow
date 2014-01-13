@@ -23,8 +23,10 @@ module Flow
         @repo_name = repo_name
 
         open_pull_requests.each do |pr|
-          notifier.say_processing pr
-          process_pull_request pr
+          if !pr.ignore
+            notifier.say_processing pr
+            process_pull_request pr
+          end
         end
 
         ask_for_reviews

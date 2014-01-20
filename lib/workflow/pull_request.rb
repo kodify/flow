@@ -37,6 +37,15 @@ module Flow
         end
       end
 
+      def all_repos_on_status?(repos = [], status = :success)
+        repos.each do |repo|
+          pr = repo.pull_request_by_name(jira_id)
+          next if pr.nil?
+          return false unless pr.status == status
+        end
+        true
+      end
+
       def status
         @__status__ ||= begin
           return :blocked       if blocked?

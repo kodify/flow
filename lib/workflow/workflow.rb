@@ -44,14 +44,14 @@ module Flow
       protected
 
       def process_pull_request(pr)
-        if (pr.status == :success)
+        if pr.status == :success and pr.all_repos_on_status?(valid_repos)
           pr.save_comments_to_be_discussed
           integrate_pull_request pr
-        elsif (pr.status == :uat_ko)
+        elsif pr.status == :uat_ko
           pr.to_in_progress jira
-        elsif (pr.status == :not_uat)
+        elsif pr.status == :not_uat and pr.all_repos_on_status?(valid_repos, :not_uat)
           pr.to_uat jira
-        elsif (pr.status == :not_reviewed)
+        elsif pr.status == :not_reviewed
           @pr_to_be_reviewed << pr
         else
           notifier.say_cant_merge pr
@@ -124,6 +124,18 @@ module Flow
 
       def repo
         @__repo__ ||= Repo.new(octokit_client, repo)
+      end
+
+      def valid_repos
+        @__valid_repos__ ||= begin
+          repos = []
+          unless config['valid_repos'].nil?
+            config['valid_repos'].each do |repo|
+              repos << Repo.new(octokit_client, repo)
+            end
+          end
+          repos
+        end
       end
 
       def jira

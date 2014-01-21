@@ -50,6 +50,7 @@ describe Flow::Workflow::Workflow do
     let!(:octokit_client) { double('octokit_client') }
     let!(:notifier)       { double('notifier', say_processing: nil) }
     let!(:ignore)         { false }
+    let!(:success_on_all_repos) { true }
     let!(:pr) do
       double('pr', {
           status: status,
@@ -57,6 +58,7 @@ describe Flow::Workflow::Workflow do
           to_uat: true,
           save_comments_to_be_discussed: true,
           ignore: ignore,
+          all_repos_on_status?: success_on_all_repos,
       } )
     end
 
@@ -68,6 +70,7 @@ describe Flow::Workflow::Workflow do
       subject.stub(:notifier).and_return notifier
       subject.stub(:integrate_pull_request).and_return true
       subject.stub(:ask_for_reviews).and_return true
+      notifier.stub(:say_cant_merge).and_return true
 
       subject.flow(repo_name)
     end
@@ -110,6 +113,13 @@ describe Flow::Workflow::Workflow do
       let!(:ignore)         { true }
       it 'should not ask for notify pull requests' do
         subject.should have_received(:ask_for_reviews)
+      end
+    end
+
+    describe 'when is not success on all repos' do
+      let!(:success_on_all_repos) { false }
+      it 'should not ask for notify pull requests' do
+        notifier.should have_received(:say_cant_merge)
       end
     end
 

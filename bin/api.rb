@@ -57,7 +57,7 @@ helpers do
   end
 
   def repos
-    Flow::Config.get['github']['valid_repos']
+    Flow::Config.get['projects'].keys
   end
 
 end

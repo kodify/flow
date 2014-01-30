@@ -9,7 +9,6 @@ parameters:
   github:
     login: github_login
     password: github_password
-    valid_repos: [ 'kodify/repo1', 'kodify/repo2', 'kodify/repo3' ]
   flow:
     pending_pr_to_notify: 3
     pending_pr_interval_in_sec: 1800

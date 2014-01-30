@@ -130,8 +130,8 @@ module Flow
       def valid_repos
         @__valid_repos__ ||= begin
           repos = []
-          unless config['valid_repos'].nil?
-            config['valid_repos'].each do |repo|
+          unless config['projects'].keys.nil?
+            config['projects'].keys.each do |repo|
               repos << Repo.new(octokit_client, repo)
             end
           end

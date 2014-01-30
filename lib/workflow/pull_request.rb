@@ -37,7 +37,7 @@ module Flow
 
       def last_status
         client.statuses(repo.name, sha).any? do |state|
-          state unless state.attrs[:description].include? 'Scrutinizer'
+          return state unless state.attrs[:description].include? 'Scrutinizer'
         end
       end
 

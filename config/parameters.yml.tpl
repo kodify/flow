@@ -15,6 +15,9 @@ parameters:
     pending_pr_interval_in_sec: 1800
   jenkins:
     url: http://my_url:18181/job/
+  scrutinizer:
+    url: https://scrutinizer-ci.com/api/repositories/g/
+    token: xxxxx
   jira:
     url: https://you.atlassian.net
     issue_path: /browse/
@@ -31,3 +34,14 @@ parameters:
     uat_ok: [ ':shipit:', '[UAT-OK]' ]
     uat_ko: [ ':boom:', '[UAT-KO]' ]
     ignore: [ '[IGNORE]' ]
+
+  projects:
+    kodify/repo1:
+      ci: 'Jenkins'
+    kodify/repo2:
+      ci: 'Scrutinizer'
+      metrics:
+        xxxx: 'threshold',
+        yyyy: 'threshold',
+    kodify/repo3:
+      ci: 'Jenkins'

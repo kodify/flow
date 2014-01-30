@@ -2,7 +2,7 @@ require 'rubygems'
 require 'thor'
 
 require File.join(File.dirname(__FILE__), 'config')
-require File.join(File.dirname(__FILE__), 'workflow/jenkins')
+require File.join(File.dirname(__FILE__), 'workflow/ciFactory')
 require File.join(File.dirname(__FILE__), 'workflow/workflow')
 require File.join(File.dirname(__FILE__), 'workflow/jira')
 require File.join(File.dirname(__FILE__), 'workflow/notifier')
@@ -26,10 +26,17 @@ E
     workflow.flow repo
   end
 
+  desc 'ci', 'Fetch ci instance based on used repo'
+  def ci(repo)
+    Flow::Workflow::CiFactory.instanceFor repo
+  end
+
   desc 'can_deploy', 'Notify kodify room if deploy is available or not'
   def can_deploy(repo, branch = 'master')
-    jenkins = Flow::Workflow::Jenkins.new
-    if jenkins.is_green?(repo, branch)
+    ci_instance = ci(repo)
+    require 'byebug';byebug
+
+    if ci_instance.is_green?(repo, branch)
       notifier.say_green_balls
     end
   end

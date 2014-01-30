@@ -6,8 +6,8 @@ module Flow
   module Workflow
     class CiFactory
       def self.instanceFor(repo)
-        ciClass = Config.get['projects'][repo]['ci']
-        return  Object.const_get("Flow::Workflow::#{ciClass}").new
+        ci_class = Config.get['projects'][repo]['ci']
+        return  Object.const_get("Flow::Workflow::#{ci_class}").new
       end
     end
   end

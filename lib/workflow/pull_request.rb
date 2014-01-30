@@ -130,7 +130,6 @@ module Flow
       end
 
       def commentNotGreen
-        #require "byebug"; byebug
         message = 'Pull request is not OK :disappointed_relieved:'
         comment! message unless comments.last.attrs[:body] == message
       end

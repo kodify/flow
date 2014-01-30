@@ -59,6 +59,7 @@ describe Flow::Workflow::Workflow do
           save_comments_to_be_discussed: true,
           ignore: ignore,
           all_repos_on_status?: success_on_all_repos,
+          commentNotGreen: nil,
       } )
     end
 
@@ -118,6 +119,9 @@ describe Flow::Workflow::Workflow do
 
     describe 'when is not success on all repos' do
       let!(:success_on_all_repos) { false }
+      it 'should leave a message on the repos saying it\'s not ok' do
+        pr.should have_received(:commentNotGreen)
+      end
       it 'should not ask for notify pull requests' do
         notifier.should have_received(:say_cant_merge)
       end

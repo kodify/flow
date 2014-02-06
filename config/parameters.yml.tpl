@@ -40,7 +40,7 @@ parameters:
     kodify/repo2:
       ci: 'Scrutinizer'
       metrics:
-        xxxx: 'threshold',
-        yyyy: 'threshold',
+        xxxx: 'threshold'
+        yyyy: 'threshold'
     kodify/repo3:
       ci: 'Jenkins'

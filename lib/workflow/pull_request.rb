@@ -42,11 +42,11 @@ module Flow
       end
 
       def green?
-        ci(repo.name).is_green?(repo.name,sha, target_url) and last_status == 'success'
+        ci( repo.name ).is_green?( repo.name, sha, target_url ) and last_status == 'success'
       end
 
       def target_url
-        client.statuses(repo.name, sha).last.rels[:target].href
+        client.statuses( repo.name, sha ).last.rels[:target].href
       end
 
       def ci(repo)
@@ -63,7 +63,6 @@ module Flow
       end
 
       def status
-
         @__status__ ||= begin
           return :blocked       if blocked?
           return :failed        if !green?
@@ -80,7 +79,6 @@ module Flow
       end
 
       def merge
-        print 'merge'
         message = "#{original_branch} #UAT-OK - PR #{number} merged"
         begin
           response = client.merge_pull_request(repo.name, pull.number, message)

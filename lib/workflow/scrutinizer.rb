@@ -17,7 +17,6 @@ module Flow
 
       def inspection_status(url,repo)
         JSON.parse(`curl #{inspection_url(inspection_uuid(url),repo)}`)
-        #JSON.parse(`curl "https://scrutinizer-ci.com/api/repositories/g/natxo-kodify/DownloaderBundle/inspections/91d802d1-dc25-4c95-81a9-ebaeb673d245?access_token=afe4cee555a3823e71935cfecfdf49437c5d1bd3fd6d8e247331255194583ea0"`)
       end
 
       def inspection_uuid(target_url)

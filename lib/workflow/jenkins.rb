@@ -4,7 +4,7 @@ module Flow
   module Workflow
     class Jenkins
 
-      def is_green?(repo, branch)
+      def is_green?(repo, branch, target_url = {})
         last_master_commit(repo, branch) == last_stable_commit(branch)
       end
 

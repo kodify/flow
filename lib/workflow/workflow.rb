@@ -6,6 +6,7 @@ require File.join(File.dirname(__FILE__), 'pull_request')
 require File.join(File.dirname(__FILE__), 'repo')
 require File.join(File.dirname(__FILE__), 'jira')
 require File.join(File.dirname(__FILE__), 'jenkins')
+require File.join(File.dirname(__FILE__), 'scrutinizer')
 
 require File.join(File.dirname(__FILE__), '..', 'config')
 
@@ -21,7 +22,6 @@ module Flow
       def flow(repo_name)
         @pr_to_be_reviewed = []
         @repo_name = repo_name
-
         open_pull_requests.each do |pr|
           if !pr.ignore
             notifier.say_processing pr
@@ -54,6 +54,7 @@ module Flow
         elsif pr.status == :not_reviewed
           @pr_to_be_reviewed << pr
         else
+          pr.commentNotGreen
           notifier.say_cant_merge pr
         end
       end
@@ -129,8 +130,8 @@ module Flow
       def valid_repos
         @__valid_repos__ ||= begin
           repos = []
-          unless config['valid_repos'].nil?
-            config['valid_repos'].each do |repo|
+          unless config['projects'].nil? or config['projects'].keys.nil?
+            config['projects'].keys.each do |repo|
               repos << Repo.new(octokit_client, repo)
             end
           end

@@ -1,3 +1,7 @@
+require File.join(File.dirname(__FILE__), 'jenkins')
+require File.join(File.dirname(__FILE__), 'scrutinizer')
+require File.join(File.dirname(__FILE__), 'ci_factory')
+
 module Flow
   module Workflow
     class PullRequest
@@ -31,10 +35,22 @@ module Flow
         has_comment_with?(dictionary['uat_ko'])
       end
 
-      def green?
+      def last_status
         client.statuses(repo.name, sha).any? do |state|
-          state.attrs[:state] == 'success'
+          return state unless state.attrs[:description].include? 'Scrutinizer'
         end
+      end
+
+      def green?
+        ci( repo.name ).is_green?( repo.name, sha, target_url ) and last_status == 'success'
+      end
+
+      def target_url
+        client.statuses( repo.name, sha ).last.rels[:target].href
+      end
+
+      def ci(repo)
+        Flow::Workflow::CiFactory.instanceFor repo
       end
 
       def all_repos_on_status?(repos = [], status = :success)
@@ -109,6 +125,11 @@ module Flow
 
       def comment!(body)
         client.add_comment(repo.name, pull.number, body)
+      end
+
+      def commentNotGreen
+        message = 'Pull request is not OK :disappointed_relieved:'
+        comment! message unless comments.last.attrs[:body] == message
       end
 
       def to_uat(jira)

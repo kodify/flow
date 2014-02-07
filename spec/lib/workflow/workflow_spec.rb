@@ -44,7 +44,17 @@ describe Flow::Workflow::Workflow do
     let!(:repo_name)      { 'supu' }
     let!(:all_prs)        { [ pr ] }
     let!(:status)         { :success }
-    let!(:config)         { { 'flow' => { 'pending_pr_to_notify' => pending_pr, 'pending_pr_interval_in_sec' => interval } } }
+    let!(:config)         do
+      {
+          'flow' => {
+              'pending_pr_to_notify' => pending_pr,
+              'pending_pr_interval_in_sec' => interval
+          },
+          'projects' => {
+              'kodify/repo1' => { 'ci'=> 'Jenkins'}
+          }
+      }
+    end
     let!(:interval)       { 1 }
     let!(:pending_pr)     { 10 }
     let!(:octokit_client) { double('octokit_client') }
@@ -59,6 +69,7 @@ describe Flow::Workflow::Workflow do
           save_comments_to_be_discussed: true,
           ignore: ignore,
           all_repos_on_status?: success_on_all_repos,
+          commentNotGreen: nil,
       } )
     end
 
@@ -118,6 +129,9 @@ describe Flow::Workflow::Workflow do
 
     describe 'when is not success on all repos' do
       let!(:success_on_all_repos) { false }
+      it 'should leave a message on the repos saying it\'s not ok' do
+        pr.should have_received(:commentNotGreen)
+      end
       it 'should not ask for notify pull requests' do
         notifier.should have_received(:say_cant_merge)
       end

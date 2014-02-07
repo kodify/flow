@@ -44,7 +44,17 @@ describe Flow::Workflow::Workflow do
     let!(:repo_name)      { 'supu' }
     let!(:all_prs)        { [ pr ] }
     let!(:status)         { :success }
-    let!(:config)         { { 'flow' => { 'pending_pr_to_notify' => pending_pr, 'pending_pr_interval_in_sec' => interval } } }
+    let!(:config)         do
+      {
+          'flow' => {
+              'pending_pr_to_notify' => pending_pr,
+              'pending_pr_interval_in_sec' => interval
+          },
+          'projects' => {
+              'kodify/repo1' => { 'ci'=> 'Jenkins'}
+          }
+      }
+    end
     let!(:interval)       { 1 }
     let!(:pending_pr)     { 10 }
     let!(:octokit_client) { double('octokit_client') }

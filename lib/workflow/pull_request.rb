@@ -23,6 +23,13 @@ module Flow
         has_comment_with?(dictionary['blocked'])
       end
 
+      def pending?
+        client.statuses(repo.name, sha).each do |state|
+          return true if state.attrs[:state] == 'pending'
+        end
+        false
+      end
+
       def reviewed?
         has_comment_with?(dictionary['reviewed'])
       end
@@ -70,6 +77,7 @@ module Flow
       def status
         @__status__ ||= begin
           return :blocked       if blocked?
+          return :pending       if pending?
           return :failed        if !green?
           return :not_reviewed  if !reviewed?
           return :uat_ko        if uat_ko?

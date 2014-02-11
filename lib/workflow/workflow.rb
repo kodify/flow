@@ -53,6 +53,8 @@ module Flow
           pr.to_uat jira
         elsif pr.status == :not_reviewed
           @pr_to_be_reviewed << pr
+        elsif pr.status == :pending
+          notifier.say_cant_merge pr
         else
           pr.commentNotGreen
           notifier.say_cant_merge pr

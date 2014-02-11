@@ -103,6 +103,13 @@ describe Flow::Workflow::Workflow do
       end
     end
 
+    describe 'for a pending pull request' do
+      let!(:status) { :pending }
+      it 'should not ask for notify pull requests' do
+        notifier.should have_received(:say_cant_merge)
+      end
+    end
+
     describe 'for a non uated pull request' do
       let!(:status) { :not_uat }
       it 'pull request should be moved to uat' do

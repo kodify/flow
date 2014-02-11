@@ -44,7 +44,7 @@ module Flow
       protected
 
       def process_pull_request(pr)
-        if pr.status == :success and pr.all_repos_on_status?(valid_repos)
+        if pr.status == :success #and pr.all_repos_on_status?(valid_repos)
           pr.save_comments_to_be_discussed
           integrate_pull_request pr
         elsif pr.status == :uat_ko

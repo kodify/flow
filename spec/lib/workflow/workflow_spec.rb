@@ -127,6 +127,7 @@ describe Flow::Workflow::Workflow do
       end
     end
 
+=begin
     describe 'when is not success on all repos' do
       let!(:success_on_all_repos) { false }
       it 'should leave a message on the repos saying it\'s not ok' do
@@ -136,6 +137,7 @@ describe Flow::Workflow::Workflow do
         notifier.should have_received(:say_cant_merge)
       end
     end
+=end
 
   end
 

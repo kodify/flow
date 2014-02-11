@@ -23,7 +23,7 @@ module Flow
       end
 
       def last_stable_build
-        @__last_stable_build__ = JSON.parse(`curl #{url}/fux/lastStableBuild/api/json`)
+        @__last_stable_build__ ||= JSON.parse(`curl #{url}/fux/lastStableBuild/api/json`)
       end
 
       def big_build(project)
@@ -32,7 +32,7 @@ module Flow
       end
 
       def stop_in_progress_build(project)
-        job = JSON.parse(`curl #{url}/#{project}/lastBuild/api/json`)
+        job = JSON.parse(`curl #{url}#{project}/lastBuild/api/json`)
         if job['result'] == nil
           `curl -X POST #{url}/#{project}/#{job['number']}/stop`
         end

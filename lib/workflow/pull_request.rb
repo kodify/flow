@@ -140,9 +140,13 @@ module Flow
         client.add_comment(repo.name, pull.number, body)
       end
 
-      def commentNotGreen
+      def comment_not_green
         message = 'Pull request is not OK :disappointed_relieved:'
-        comment! message unless comments.last.attrs[:body] == message
+        if comments.empty?
+          comment! message
+        elsif comments.last.attrs[:body] != message
+          comment! message
+        end
       end
 
       def to_uat(jira)

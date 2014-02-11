@@ -42,11 +42,16 @@ module Flow
       end
 
       def green?
-        ci( repo.name ).is_green?( repo.name, sha, target_url ) and last_status == 'success'
+        ci( repo.name ).is_green?( repo.name, original_branch, target_url ) and last_status == 'success'
       end
 
       def target_url
-        client.statuses( repo.name, sha ).last.rels[:target].href
+        target = client.statuses( repo.name, sha ).last.rels[:target]
+        if target.nil?
+          ''
+        else
+          target.href
+        end
       end
 
       def ci(repo)

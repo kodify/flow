@@ -26,10 +26,6 @@ E
     workflow.flow repo
   end
 
-  def ci(repo)
-    Flow::Workflow::CiFactory.instanceFor repo
-  end
-
   desc 'can_deploy', 'Notify kodify room if deploy is available or not'
   def can_deploy(repo, branch = 'master')
     ci_instance = ci(repo)
@@ -60,6 +56,10 @@ E
   end
 
   protected
+
+  def ci(repo)
+    Flow::Workflow::CiFactory.instanceFor repo
+  end
 
   def notifier
     @__notifier__ ||= Flow::Workflow::Notifier.new self

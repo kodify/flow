@@ -5,7 +5,9 @@ module Flow
     class Jenkins
 
       def is_green?(repo, branch, target_url = {})
-        last_master_commit(repo, branch) == last_stable_commit(branch)
+        master_commit = last_master_commit(repo, branch)
+        return true if master_commit.nil?
+        master_commit == last_stable_commit(branch)
       end
 
       def last_master_commit(repo, branch = 'master')
@@ -14,7 +16,9 @@ module Flow
 
       def last_stable_commit(branch)
         if last_stable_build
-          last_stable_build['actions'][1]['buildsByBranchName']["origin/#{branch}"]['revision']['SHA1']
+          if last_stable_build['actions'][1]['buildsByBranchName']["origin/#{branch}"]
+            last_stable_build['actions'][1]['buildsByBranchName']["origin/#{branch}"]['revision']['SHA1']
+          end
         end
       end
 

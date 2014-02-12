@@ -1,6 +1,7 @@
 require 'json'
 require File.join(File.dirname(__FILE__), '../config')
-
+require File.join(File.dirname(__FILE__), 'continuous_integration', 'jenkins')
+require File.join(File.dirname(__FILE__), 'continuous_integration', 'scrutinizer')
 
 module Flow
   module Workflow

@@ -1,14 +1,18 @@
 require 'json'
+require File.join(File.dirname(__FILE__), 'continuous_integration')
 
 module Flow
   module Workflow
     class Jenkins
+      extend Flow::Workflow::ContinuousIntegration
 
       def is_green?(repo, branch, target_url = {})
         master_commit = last_master_commit(repo, branch)
         return true if master_commit.nil?
         master_commit == last_stable_commit(branch)
       end
+
+      protected
 
       def last_master_commit(repo, branch = 'master')
         `git ls-remote "git@github.com:#{repo}.git" |grep "refs/heads/#{branch}$"`.split(' ')[0]

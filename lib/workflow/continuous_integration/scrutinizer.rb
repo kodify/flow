@@ -1,8 +1,11 @@
 require 'json'
+require File.join(File.dirname(__FILE__), 'continuous_integration')
+
 
 module Flow
   module Workflow
     class Scrutinizer
+      extend Flow::Workflow::ContinuousIntegration
 
       def is_green?(repo, branch, target_url)
         status = inspection_status(target_url, repo)
@@ -15,6 +18,8 @@ module Flow
         true
       end
 
+      protected
+
       def inspection_status(url,repo)
         JSON.parse(`curl #{inspection_url(inspection_uuid(url),repo)}`)
       end
@@ -25,18 +30,6 @@ module Flow
 
       def last_master_commit(repo, branch = 'master')
         `git ls-remote "git@github.com:#{repo}.git" |grep "refs/heads/#{branch}$"`.split(' ')[0]
-      end
-
-      def last_stable_commit(branch)
-      end
-
-      def last_stable_build
-      end
-
-      def big_build(project)
-      end
-
-      def stop_in_progress_build(project)
       end
 
       def url

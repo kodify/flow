@@ -5,8 +5,6 @@ require File.join(File.dirname(__FILE__), 'notifier')
 require File.join(File.dirname(__FILE__), 'pull_request')
 require File.join(File.dirname(__FILE__), 'repo')
 require File.join(File.dirname(__FILE__), 'jira')
-require File.join(File.dirname(__FILE__), 'jenkins')
-require File.join(File.dirname(__FILE__), 'scrutinizer')
 
 require File.join(File.dirname(__FILE__), '..', 'config')
 

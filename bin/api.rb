@@ -6,8 +6,6 @@ set :port, 9494
 
 path = File.expand_path(File.dirname(__FILE__) + '/..')
 
-require path + '/lib/workflow/jenkins'
-
 require File.join(path, 'lib', 'config')
 require File.join(path, 'lib', 'workflow', 'repo')
 require File.join(path, 'lib', 'workflow', 'workflow')
@@ -26,10 +24,6 @@ end
 
 
 helpers do
-  def valid_deploy?(params)
-    jenkins = Flow::Workflow::Jenkins.new
-    !(params[:branch] == 'production' && !jenkins.is_green?(params[:repo], params[:branch]))
-  end
 
   def move_pr(method)
     status 404

@@ -1,5 +1,3 @@
-require File.join(File.dirname(__FILE__), 'jenkins')
-require File.join(File.dirname(__FILE__), 'scrutinizer')
 require File.join(File.dirname(__FILE__), 'ci_factory')
 
 module Flow

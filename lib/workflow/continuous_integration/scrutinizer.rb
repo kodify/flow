@@ -18,10 +18,13 @@ module Flow
           @__green__[pr.original_branch] = begin
             build_green?(pr) && scrutinizer_green?(pr)
           rescue Exception => e
-            require 'debugger'; debugger
             false
           end
         end
+      end
+
+      def pending?(pr)
+        last_scrutinizer_github_status(pr) == 'pending'
       end
 
       protected

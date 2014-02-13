@@ -22,6 +22,10 @@ module Flow
         end
       end
 
+      def pending?(pr)
+        false
+      end
+
       protected
 
       def last_master_commit(repo, branch = 'master')

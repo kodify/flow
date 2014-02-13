@@ -1,5 +1,5 @@
 require 'spec_helper'
-require File.join(@@base_path, 'lib', 'workflow', 'pull_request')
+require File.join(base_path, 'lib', 'workflow', 'pull_request')
 
 describe 'PullRequest' do
   let!(:client)     { double('client') }

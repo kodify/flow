@@ -1,8 +1,8 @@
 ENV['RACK_ENV'] = 'test'
 
 require 'spec_helper'
-require File.join(@@base_path, 'bin', 'api')
-require File.join(@@base_path, 'lib', 'workflow', 'repo')
+require File.join(base_path, 'bin', 'api')
+require File.join(base_path, 'lib', 'workflow', 'repo')
 
 describe 'The HelloWorld App' do
   let!(:issue_key) { '0' }

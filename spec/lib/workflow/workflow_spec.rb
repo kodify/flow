@@ -1,7 +1,16 @@
 require 'spec_helper'
-require File.join(@@base_path, 'lib', 'workflow', 'workflow')
+require File.join(base_path, 'lib', 'workflow', 'workflow')
 
 describe Flow::Workflow::Workflow do
+  let!(:repo)         { 'kodify/repo1' }
+  let!(:fake_config) do
+    YAML::load_file(File.join(base_path, 'config', 'parameters.yml.tpl'))['parameters']
+  end
+
+  before do
+    Flow::Config.stub(:get).and_return(fake_config)
+    subject.stub(:repo).and_return(repo)
+  end
 
   describe '#integrate_pull_request' do
     let!(:pr)       { double('pr', merge: merge, to_done: nil, delete_original_branch: nil, ignore: false) }

@@ -4,7 +4,9 @@ require 'rack/test'
 require 'codeclimate-test-reporter'
 CodeClimate::TestReporter.start
 
-@@base_path = File.join(File.dirname(__FILE__), '..')
+def base_path
+  @base_path ||= File.join(File.dirname(__FILE__), '..')
+end
 
 RSpec.configure do |c|
   c.backtrace_exclusion_patterns = []

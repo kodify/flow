@@ -2,9 +2,8 @@ require 'rubygems'
 require 'thor'
 
 require File.join(File.dirname(__FILE__), 'config')
-require File.join(File.dirname(__FILE__), 'workflow/ci_factory')
+require File.join(File.dirname(__FILE__), 'workflow/factory')
 require File.join(File.dirname(__FILE__), 'workflow/workflow')
-require File.join(File.dirname(__FILE__), 'workflow/jira')
 require File.join(File.dirname(__FILE__), 'workflow/notifier')
 
 def current_path
@@ -36,10 +35,10 @@ E
 
   desc 'uat_checker', 'Alert of unassigned uat message'
   def uat_checker
-    issues = Flow::Workflow::Jira.new.issues_by_status('UAT')
+    issues = jira.issues_by_status('UAT')
     issues_unassigned_on_uat = []
     html_message = ""
-    issue_url = config['jira']['url'] + config['jira']['issue_path']
+    issue_url = jira.issue_url
 
     issues.each do |issue|
       if issue['fields']['assignee'].nil?
@@ -48,7 +47,7 @@ E
       end
     end
 
-    if issues_unassigned_on_uat.length >= config['jira']['min_unassigned_uats']
+    if issues_unassigned_on_uat.length >= jira.min_unassigned_uats
       html_message = "There are #{issues_unassigned_on_uat.length} PR ready to be uated in #{@repo_name} repo: #{html_message}"
       notifier.room = config['hipchat']['uat_room']
       notifier.say html_message, :notify => true, :message_format => 'html'
@@ -58,7 +57,11 @@ E
   protected
 
   def ci(repo)
-    Flow::Workflow::CiFactory.instanceFor repo
+    Flow::Workflow::Factory.instanceFor(repo, :ci)
+  end
+
+  def jira(repo)
+    @__jira__ ||= Flow::Workflow::Factory.instanceFor(repo, :it)
   end
 
   def notifier

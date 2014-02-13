@@ -1,4 +1,4 @@
-require File.join(File.dirname(__FILE__), 'ci_factory')
+require File.join(File.dirname(__FILE__), 'factory')
 
 module Flow
   module Workflow
@@ -22,10 +22,7 @@ module Flow
       end
 
       def pending?
-        client.statuses(repo.name, sha).each do |state|
-          return true if state.attrs[:state] == 'pending'
-        end
-        false
+        ci(repo.name).pending?(self)
       end
 
       def reviewed?
@@ -40,27 +37,18 @@ module Flow
         has_comment_with?(dictionary['uat_ko'])
       end
 
-      def last_status
-        client.statuses(repo.name, sha).any? do |state|
-          return state unless state.attrs[:description].include? 'Scrutinizer'
-        end
-      end
-
       def green?
-        ci( repo.name ).is_green?( repo.name, original_branch, target_url ) and last_status == 'success'
+        ci(repo.name).is_green?(self)
       end
 
-      def target_url
-        target = client.statuses( repo.name, sha ).last.rels[:target]
-        if target.nil?
-          ''
-        else
-          target.href
-        end
+      def statuses
+        @__statuses__ ||= {}
+        @__statuses__[repo.name] ||= {}
+        @__statuses__[repo.name][sha] ||= client.statuses(repo.name, sha)
       end
 
       def ci(repo)
-        Flow::Workflow::CiFactory.instanceFor repo
+        Flow::Workflow::Factory.instanceFor(repo, :ci)
       end
 
       def all_repos_on_status?(repos = [], status = :success)
@@ -138,12 +126,13 @@ module Flow
         client.add_comment(repo.name, pull.number, body)
       end
 
-      def comment_not_green
-        message = 'Pull request is not OK :disappointed_relieved:'
+      def comment_not_green(extra_message)
+        message = "Pull request is not OK :disappointed_relieved:"
+        require 'debugger'; debugger
         if comments.empty?
-          comment! message
-        elsif comments.last.attrs[:body] != message
-          comment! message
+          comment! "**#{message}** \n #{extra_message}"
+        elsif !comments.last.attrs[:body].include? message
+          comment! "**#{message}** \n #{extra_message}"
         end
       end
 
@@ -175,6 +164,10 @@ module Flow
 
       def sha
         pull.head.attrs[:sha]
+      end
+
+      def repo_name
+        repo.name
       end
     end
   end

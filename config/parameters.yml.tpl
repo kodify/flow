@@ -17,16 +17,6 @@ parameters:
   scrutinizer:
     url: https://scrutinizer-ci.com/api/repositories/g/
     token: xxxxx
-  jira:
-    url: https://you.atlassian.net
-    issue_path: /browse/
-    user: api
-    pass: my_jira_password
-    min_unassigned_uats: 3
-    transitions:
-      ready_uat: id_ready_uat
-      uat_nok: id_uat_ko
-      done: id_to_done
   dictionary:
     blocked: [ ':-1:', '[B]', '[b]' ]
     reviewed: [ ':+1:', '+1' ]
@@ -36,11 +26,47 @@ parameters:
 
   projects:
     kodify/repo1:
-      ci: 'Jenkins'
+      ci:
+        class_name: 'Jenkins'
+      it:
+        class_name: 'Jira'
+        url: https://you.atlassian.net
+        issue_path: /browse/
+        user: api
+        pass: my_jira_password
+        min_unassigned_uats: 3
+        transitions:
+          ready_uat: id_ready_uat
+          uat_nok: id_uat_ko
+          done: id_to_done
     kodify/repo2:
-      ci: 'Scrutinizer'
+      ci:
+        class_name: 'Scrutinizer'
       metrics:
         xxxx: 'threshold'
         yyyy: 'threshold'
+      it:
+        class_name: 'Jira'
+        url: https://you.atlassian.net
+        issue_path: /browse/
+        user: api
+        pass: my_jira_password
+        min_unassigned_uats: 3
+        transitions:
+          ready_uat: id_ready_uat
+          uat_nok: id_uat_ko
+          done: id_to_done
     kodify/repo3:
-      ci: 'Jenkins'
+      ci:
+        class_name: 'Jenkins'
+      it:
+        class_name: 'Jira'
+        url: https://you.atlassian.net
+        issue_path: /browse/
+        user: api
+        pass: my_jira_password
+        min_unassigned_uats: 3
+        transitions:
+          ready_uat: id_ready_uat
+          uat_nok: id_uat_ko
+          done: id_to_done

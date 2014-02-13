@@ -4,7 +4,6 @@ require 'digest/md5'
 require File.join(File.dirname(__FILE__), 'notifier')
 require File.join(File.dirname(__FILE__), 'pull_request')
 require File.join(File.dirname(__FILE__), 'repo')
-require File.join(File.dirname(__FILE__), 'jira')
 
 require File.join(File.dirname(__FILE__), '..', 'config')
 
@@ -54,7 +53,6 @@ module Flow
         elsif pr.status == :pending
           notifier.say_cant_merge pr
         else
-          pr.comment_not_green
           notifier.say_cant_merge pr
         end
       end
@@ -140,7 +138,7 @@ module Flow
       end
 
       def jira
-        @__jira__ ||= Jira.new
+        @__jira__ ||= Flow::Workflow::Factory.instanceFor(repo, :it)
       end
 
       def config

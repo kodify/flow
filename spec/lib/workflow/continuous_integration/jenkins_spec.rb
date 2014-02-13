@@ -1,5 +1,5 @@
 require 'spec_helper'
-require File.join(@@base_path, 'lib', 'workflow', 'continuous_integration', 'jenkins')
+require File.join(base_path, 'lib', 'workflow', 'continuous_integration', 'jenkins')
 
 
 describe 'Flow::Workflow::Jenkins' do

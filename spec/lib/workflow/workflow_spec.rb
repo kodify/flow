@@ -1,10 +1,10 @@
 require 'spec_helper'
-require File.join(@@base_path, 'lib', 'workflow', 'workflow')
+require File.join(base_path, 'lib', 'workflow', 'workflow')
 
 describe Flow::Workflow::Workflow do
   let!(:repo)         { 'kodify/repo1' }
   let!(:fake_config) do
-    YAML::load_file(File.join(@@base_path, 'config', 'parameters.yml.tpl'))['parameters']
+    YAML::load_file(File.join(base_path, 'config', 'parameters.yml.tpl'))['parameters']
   end
 
   before do

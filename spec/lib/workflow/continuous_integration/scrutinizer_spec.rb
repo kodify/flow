@@ -1,5 +1,5 @@
 require 'spec_helper'
-require File.join(@@base_path, 'lib', 'workflow', 'continuous_integration', 'scrutinizer')
+require File.join(base_path, 'lib', 'workflow', 'continuous_integration', 'scrutinizer')
 
 describe 'Flow::Workflow:Scrutinizer' do
   let!(:subject)  { Flow::Workflow::Scrutinizer.new }

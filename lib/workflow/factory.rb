@@ -12,6 +12,7 @@ module Flow
         @__ci_instances__[type.to_s] ||= {}
         @__ci_instances__[type.to_s][repo] ||= begin
           config = Flow::Config.get['projects'][repo][type.to_s]
+
           Flow.const_get('Workflow').const_get(config['class_name']).new(config)
         end
       end

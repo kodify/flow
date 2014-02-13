@@ -53,7 +53,6 @@ module Flow
         elsif pr.status == :pending
           notifier.say_cant_merge pr
         else
-          pr.comment_not_green
           notifier.say_cant_merge pr
         end
       end

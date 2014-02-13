@@ -40,23 +40,14 @@ module Flow
         has_comment_with?(dictionary['uat_ko'])
       end
 
-      def last_status
-        client.statuses(repo.name, sha).any? do |state|
-          return state unless state.attrs[:description].include? 'Scrutinizer'
-        end
-      end
-
       def green?
-        ci(repo.name).is_green?(repo.name, original_branch, target_url) and last_status == 'success'
+        ci(repo.name).is_green?(self)
       end
 
-      def target_url
-        target = client.statuses( repo.name, sha ).last.rels[:target]
-        if target.nil?
-          ''
-        else
-          target.href
-        end
+      def statuses
+        @__statuses__ ||= {}
+        @__statuses__[repo.name] ||= {}
+        @__statuses__[repo.name][sha] ||= client.statuses(repo.name, sha)
       end
 
       def ci(repo)
@@ -75,7 +66,7 @@ module Flow
       def status
         @__status__ ||= begin
           return :blocked       if blocked?
-          return :pending       if pending?
+          # return :pending       if pending?
           return :failed        if !green?
           return :not_reviewed  if !reviewed?
           return :uat_ko        if uat_ko?
@@ -175,6 +166,10 @@ module Flow
 
       def sha
         pull.head.attrs[:sha]
+      end
+
+      def repo_name
+        repo.name
       end
     end
   end

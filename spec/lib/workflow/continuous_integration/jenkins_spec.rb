@@ -1,10 +1,12 @@
 require 'spec_helper'
 require File.join(base_path, 'lib', 'workflow', 'continuous_integration', 'jenkins')
+require File.join(base_path, 'lib', 'workflow', 'pull_request')
 
 
 describe 'Flow::Workflow::Jenkins' do
 
-  let!(:subject)  { Flow::Workflow::Jenkins.new }
+  let!(:config)    { { 'url' => 'supu', 'project_name' => 'tupu' }}
+  let!(:subject)  { Flow::Workflow::Jenkins.new(config) }
 
   describe '#is_green?' do
     let!(:repo)                   { nil }
@@ -14,25 +16,28 @@ describe 'Flow::Workflow::Jenkins' do
     let!(:builds_by_branch_name)  { { "origin/#{branch}" => { 'revision' => { 'SHA1' => last_green_commit }}} }
     let!(:last_master_commit)     { 'supu' }
     let!(:last_green_commit)      { 'supu' }
+    let!(:pr)                     { Flow::Workflow::PullRequest.new(nil, nil, nil) }
 
     before do
+      pr.stub(:repo_name).and_return(repo)
+      pr.stub(:original_branch).and_return(branch)
       subject.stub(:last_stable_build).and_return(last_stable_build)
       subject.stub(:last_master_commit).and_return(last_master_commit)
     end
 
     describe 'for a valid jenkins response' do
       describe 'and last master commit is equal to jenkins last green build' do
-        it { subject.is_green?(repo, branch).should be_true }
+        it { subject.is_green?(pr).should be_true }
       end
       describe 'and last master commit is different to jenkins last green build' do
         let!(:last_green_commit) { 'tupu' }
-        it { subject.is_green?(repo, branch).should_not be_true }
+        it { subject.is_green?(pr).should_not be_true }
       end
     end
 
     describe 'for an invalid jenkins response' do
       let!(:last_stable_build) { nil }
-      it { subject.is_green?(repo, branch).should be_false }
+      it { subject.is_green?(pr).should be_false }
     end
   end
 end

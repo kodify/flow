@@ -5,11 +5,21 @@ module Flow
   module Workflow
     class Jenkins
       extend Flow::Workflow::ContinuousIntegration
+      attr_accessor :config
 
-      def is_green?(repo, branch, target_url = {})
-        master_commit = last_master_commit(repo, branch)
-        return true if master_commit.nil?
-        master_commit == last_stable_commit(branch)
+      def initialize(config)
+        @config = config
+      end
+
+      def is_green?(pr)
+        @__green__ ||= {}
+        unless @__green__.include? pr.original_branch
+          @__green__[pr.original_branch] = begin
+            master_commit = last_master_commit(pr.repo_name, pr.original_branch)
+            return true if master_commit.nil?
+            master_commit == last_stable_commit(pr.original_branch)
+          end
+        end
       end
 
       protected
@@ -27,23 +37,8 @@ module Flow
       end
 
       def last_stable_build
-        @__last_stable_build__ ||= JSON.parse(`curl #{url}/fux/lastStableBuild/api/json`)
-      end
-
-      def big_build(project)
-        stop_in_progress_build project
-        `curl -X POST #{url}/#{project}/build`
-      end
-
-      def stop_in_progress_build(project)
-        job = JSON.parse(`curl #{url}#{project}/lastBuild/api/json`)
-        if job['result'] == nil
-          `curl -X POST #{url}/#{project}/#{job['number']}/stop`
-        end
-      end
-
-      def url
-        Flow::Config.get['jenkins']['url']
+        @__last_stable_build__ ||= JSON.parse(`curl #{config['url']}/lastStableBuild/api/json`)
+      rescue
       end
     end
   end

@@ -6,21 +6,80 @@ module Flow
   module Workflow
     class Scrutinizer
       extend Flow::Workflow::ContinuousIntegration
+      attr_accessor :config
 
-      def is_green?(repo, branch, target_url)
-        status = inspection_status(target_url, repo)
-        return true if status['state'] != 'failed' && metrics_are_valid(repo, status)
-      rescue
+      def initialize(config)
+        @config = config
+      end
+
+      def is_green?(pr)
+        @__green__ ||= {}
+        unless @__green__.include? pr.original_branch
+          @__green__[pr.original_branch] = begin
+            build_green?(pr) && scrutinizer_green?(pr)
+          rescue Exception => e
+            require 'debugger'; debugger
+            false
+          end
+        end
       end
 
       protected
 
-      def inspection_status(url, repo)
+      def build_green?(pr)
+        status = last_travis_status pr
+        return unless status
+        return status.state == 'success'
+      end
+
+      def scrutinizer_green?(pr)
+        metrics = valid_metrics?(pr)
+        status  = last_scrutinizer_github_status(pr)
+        return unless status
+
+        if !metrics && status.state == 'success'
+          pr.comment_not_green
+        end
+
+         metrics && status.state == 'success'
+      end
+
+      def target_url(pr)
+        target = last_scrutinizer_github_status(pr)
+        return unless target
+
+        if target.rels[:target].nil?
+          ''
+        else
+          target.rels[:target].href
+        end
+      end
+
+      def last_status(pr, pattern)
+        statuses = pr.statuses
+        return unless statuses
+
+        statuses.any? do |state|
+          return state if state.description.include? pattern
+        end
+      end
+
+      def last_travis_status(pr)
+        last_status(pr, 'The Travis CI')
+      end
+
+      def last_scrutinizer_github_status(pr)
+        last_status(pr, 'Scrutinizer')
+      end
+
+      def inspection_status(pr)
+        return unless url = target_url(pr)
+        repo = pr.repo_name
         JSON.parse(`curl #{inspection_url(inspection_uuid(url), repo)}`)
       end
 
       def inspection_uuid(target_url)
-        target_url.slice(target_url.index('inspections'),target_url.size).sub('inspections/','')
+        target_url.slice(target_url.index('inspections'), target_url.size).sub('inspections/', '')
       end
 
       def inspection_url(uuid, repo)
@@ -31,27 +90,23 @@ module Flow
         status['_embedded']['head_index']['_embedded']['project']['metric_values']
       end
 
-      def metrics_are_valid(repo, status)
-        metrics_on_repo = metrics_to_check(repo)
+      def valid_metrics?(pr)
+        status = inspection_status(pr)
+        return unless status
+        return if status['state'] == 'failed'
+
+        metrics_on_repo = config['metrics']
         metrics_on_repo.keys.all? do |key|
           metrics(status)[key].to_f > metrics_on_repo[key].to_f
         end
       end
 
       def url
-        config['scrutinizer']['url']
+        config['url']
       end
 
       def token
-        config['scrutinizer']['token']
-      end
-
-      def metrics_to_check(repo)
-        config['projects'][repo]['metrics']
-      end
-
-      def config
-        @__config__ ||= Flow::Config.get
+        config['token']
       end
     end
   end

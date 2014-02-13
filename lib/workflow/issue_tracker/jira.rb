@@ -54,6 +54,10 @@ module Flow
         "#{config['url']}/rest/api/latest/issue/#{issue}/transitions\?expand\=transitions.fields\&transitionId\=#{status[status_id]}"
       end
 
+      def min_unassigned_uats
+        config['min_unassigned_uats']
+      end
+
       def data_for_move(status_id)
         "{\"transition\":{\"id\" : \"#{status[status_id]}\"}}"
       end

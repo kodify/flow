@@ -2,7 +2,7 @@ require 'rubygems'
 require 'thor'
 
 require File.join(File.dirname(__FILE__), 'config')
-require File.join(File.dirname(__FILE__), 'workflow/ci_factory')
+require File.join(File.dirname(__FILE__), 'workflow/factory')
 require File.join(File.dirname(__FILE__), 'workflow/workflow')
 require File.join(File.dirname(__FILE__), 'workflow/jira')
 require File.join(File.dirname(__FILE__), 'workflow/notifier')

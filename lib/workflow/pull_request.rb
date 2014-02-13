@@ -1,4 +1,4 @@
-require File.join(File.dirname(__FILE__), 'ci_factory')
+require File.join(File.dirname(__FILE__), 'factory')
 
 module Flow
   module Workflow
@@ -47,7 +47,7 @@ module Flow
       end
 
       def green?
-        ci( repo.name ).is_green?( repo.name, original_branch, target_url ) and last_status == 'success'
+        ci(repo.name).is_green?(repo.name, original_branch, target_url) and last_status == 'success'
       end
 
       def target_url
@@ -60,7 +60,7 @@ module Flow
       end
 
       def ci(repo)
-        Flow::Workflow::CiFactory.instanceFor repo
+        Flow::Workflow::Factory.instanceFor(repo, :ci)
       end
 
       def all_repos_on_status?(repos = [], status = :success)

@@ -4,6 +4,12 @@ require 'rest_client'
 module Flow
   module Workflow
     class Jira
+      attr_accessor :config
+
+      def initialize(config)
+        @config = config
+      end
+
       def do_move(status_id, issue)
         json = data_for_move status_id
         output = `curl -D- -u #{user}:#{pass} -X POST --data '#{json}' -H "Content-Type: application/json" #{issue_url(issue, status_id)}`
@@ -11,7 +17,7 @@ module Flow
       end
 
       def issues_by_status(status_name)
-        url   = "#{config['jira']['url']}/rest/api/latest/search?jql='status'='#{status_name}'"
+        url   = "#{config['url']}/rest/api/latest/search?jql='status'='#{status_name}'"
         get_collection(url)['issues']
       end
 
@@ -37,23 +43,19 @@ module Flow
       end
 
       def user
-        Flow::Config.get['jira']['user']
+        config['user']
       end
 
       def pass
-        Flow::Config.get['jira']['pass']
+        config['pass']
       end
 
       def issue_url(issue, status_id)
-        "#{config['jira']['url']}/rest/api/latest/issue/#{issue}/transitions\?expand\=transitions.fields\&transitionId\=#{status[status_id]}"
+        "#{config['url']}/rest/api/latest/issue/#{issue}/transitions\?expand\=transitions.fields\&transitionId\=#{status[status_id]}"
       end
 
       def data_for_move(status_id)
         "{\"transition\":{\"id\" : \"#{status[status_id]}\"}}"
-      end
-
-      def config
-        @__config__ ||= Flow::Config.get
       end
     end
   end

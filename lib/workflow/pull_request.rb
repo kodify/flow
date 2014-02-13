@@ -126,12 +126,13 @@ module Flow
         client.add_comment(repo.name, pull.number, body)
       end
 
-      def comment_not_green
-        message = 'Pull request is not OK :disappointed_relieved:'
+      def comment_not_green(extra_message)
+        message = "Pull request is not OK :disappointed_relieved:"
+        require 'debugger'; debugger
         if comments.empty?
-          comment! message
-        elsif comments.last.attrs[:body] != message
-          comment! message
+          comment! "**#{message}** \n #{extra_message}"
+        elsif !comments.last.attrs[:body].include? message
+          comment! "**#{message}** \n #{extra_message}"
         end
       end
 

@@ -36,15 +36,25 @@ module Flow
       end
 
       def scrutinizer_green?(pr)
-        metrics = valid_metrics?(pr)
-        status  = last_scrutinizer_github_status(pr)
+        metrics             = valid_metrics?(pr)
+        status              = last_scrutinizer_github_status(pr)
+        scrutinizer_status  = inspection_status(pr)
         return unless status
+        return unless scrutinizer_status
 
+        comment = ''
         if !metrics && status.state == 'success'
-          pr.comment_not_green
+          comment << "\n Metrics doesn't accomplish the configuration : \n\n #{metrics_report(pr)}"
         end
 
-         metrics && status.state == 'success'
+        if ['failed', 'canceled'].include? scrutinizer_status['state']
+          url = scrutinizer_status['_links']['self']['href'].gsub('/api/repositories/', 'https://scrutinizer-ci.com/')
+          comment << "Current scrutinizer status - **#{scrutinizer_status['state']}** \n\n Relaunch it at (#{url}) or die!"
+        end
+
+        pr.comment_not_green comment if !comment.empty?
+
+        metrics && status.state == 'success'
       end
 
       def target_url(pr)
@@ -76,9 +86,9 @@ module Flow
       end
 
       def inspection_status(pr)
-        return unless url = target_url(pr)
+        return ['state' => 'not_started'] unless url = target_url(pr)
         repo = pr.repo_name
-        JSON.parse(`curl #{inspection_url(inspection_uuid(url), repo)}`)
+        @__inspection_status__ ||= JSON.parse(`curl #{inspection_url(inspection_uuid(url), repo)}`)
       end
 
       def inspection_uuid(target_url)
@@ -90,18 +100,31 @@ module Flow
       end
 
       def metrics(status)
-        status['_embedded']['head_index']['_embedded']['project']['metric_values']
+        status['_embedded']['repository']['applications']['master']['index']['_embedded']['project']['metric_values']
       end
 
       def valid_metrics?(pr)
         status = inspection_status(pr)
-        return unless status
-        return if status['state'] == 'failed'
+
+        return if ['failed', 'canceled'].include? status['state']
 
         metrics_on_repo = config['metrics']
         metrics_on_repo.keys.all? do |key|
           metrics(status)[key].to_f > metrics_on_repo[key].to_f
         end
+      end
+
+      def metrics_report(pr)
+        status = inspection_status(pr)
+        return unless status
+
+        report = "Metric | Max. Expected | Your Results\r\n";
+        report << "--- | --- | ---\r\n";
+        metrics_on_repo = config['metrics']
+        metrics_on_repo.keys.each do |key|
+          report <<  "#{key} | #{metrics_on_repo[key].to_f} | #{metrics(status)[key].to_f}\r\n"
+        end
+        report << "\n"
       end
 
       def url

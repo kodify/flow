@@ -57,7 +57,7 @@ E
   protected
 
   def ci(repo)
-    Flow::Workflow::CiFactory.instanceFor(repo, :ci)
+    Flow::Workflow::Factory.instanceFor(repo, :ci)
   end
 
   def jira(repo)

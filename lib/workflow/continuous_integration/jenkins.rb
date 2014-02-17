@@ -3,13 +3,7 @@ require File.join(File.dirname(__FILE__), 'continuous_integration')
 
 module Flow
   module Workflow
-    class Jenkins
-      extend Flow::Workflow::ContinuousIntegration
-      attr_accessor :config
-
-      def initialize(config, options = {})
-        @config = config
-      end
+    class Jenkins < Flow::Workflow::ContinuousIntegration
 
       def is_green?(pr)
         @__green__ ||= {}
@@ -20,10 +14,6 @@ module Flow
             master_commit == last_stable_commit(pr.original_branch)
           end
         end
-      end
-
-      def pending?(pr)
-        false
       end
 
       protected

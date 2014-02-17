@@ -1,12 +1,9 @@
 require 'octokit'
+require File.join(File.dirname(__FILE__), 'source_control')
 
 module Flow
   module Workflow
-    class Github
-
-      def initialize(config, options = {})
-        @config = config
-      end
+    class Github < Flow::Workflow::SourceControl
 
       def add_comment(repo, number, body)
         client.add_comment repo, number, body

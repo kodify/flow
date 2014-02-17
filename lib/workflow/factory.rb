@@ -4,7 +4,7 @@ require File.join(File.dirname(__FILE__), 'continuous_integration', 'jenkins')
 require File.join(File.dirname(__FILE__), 'continuous_integration', 'scrutinizer')
 require File.join(File.dirname(__FILE__), 'issue_tracker', 'jira')
 require File.join(File.dirname(__FILE__), 'notifier', 'hipchat')
-require File.join(File.dirname(__FILE__), 'scm', 'github')
+require File.join(File.dirname(__FILE__), 'source_control', 'github')
 
 module Flow
   module Workflow

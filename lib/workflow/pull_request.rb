@@ -51,7 +51,7 @@ module Flow
       end
 
       def client
-        @__client__ ||= Flow::Workflow::Factory.instanceFor(@repo.name, :scm)
+        @__client__ ||= Flow::Workflow::Factory.instanceFor(@repo.name, :source_control)
       end
 
       def all_repos_on_status?(repos = [], status = :success)

@@ -22,6 +22,12 @@ get '/ping' do
   'its alive'
 end
 
+=begin
+post '/payload' do
+  push = JSON.parse(params[:payload])
+  puts "I got some JSON: #{push.inspect}"
+end
+=end
 
 helpers do
 

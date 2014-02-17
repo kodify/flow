@@ -76,9 +76,9 @@ describe 'Flow::Workflow:Scrutinizer' do
 
           let!(:metrics) do
             {
-              'pdepend.cyclomatic_complexity_number'  => '200',
-              'scrutinizer.quality'                   => '10',
-              'scrutinizer.nb_issues'                 => '2000',
+              'pdepend.cyclomatic_complexity_number'  => '120',
+              'scrutinizer.quality'                   => '7',
+              'scrutinizer.nb_issues'                 => '1500',
             }
           end
 

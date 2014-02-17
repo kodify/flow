@@ -4,7 +4,7 @@ module Flow
       attr_accessor :client, :name
 
       def initialize(repo_name)
-        @name   = repo_name
+        @name = repo_name
       end
 
       def pull_requests
@@ -21,23 +21,23 @@ module Flow
 
       def issue!(title, body = '', options = {})
         return if issue_exists(title)
-        client.create_issue(name, title, body, options)
+        client.create_issue(@name, title, body, options)
       end
 
       protected
 
       def pulls
-        client.pull_requests(name).map do |pull|
+        client.pull_requests(@name).map do |pull|
           PullRequest.new(self, pull)
         end
       end
 
       def issues
-        client.issues(name)
+        client.issues(@name)
       end
 
       def client
-        @__client__ ||= Flow::Workflow::Factory.instanceFor(@repo, :source_control)
+        @__client__ ||= Flow::Workflow::Factory.instanceFor(@name, :source_control)
       end
     end
   end

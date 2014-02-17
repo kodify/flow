@@ -39,15 +39,8 @@ helpers do
   end
 
   def pull_request(repo_name, issue_key)
-    repo = Flow::Workflow::Repo.new(github_client, repo_name)
+    repo = Flow::Workflow::Repo.new(repo_name)
     repo.pull_request_by_name(issue_key)
-  end
-
-  def github_client
-    @__github_client__ ||= begin
-      workflow = Flow::Workflow::Workflow.new
-      workflow.octokit_client
-    end
   end
 
   def repos

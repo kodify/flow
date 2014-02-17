@@ -1,8 +1,8 @@
-require 'octokit'
 require 'digest/md5'
 
 require File.join(File.dirname(__FILE__), 'pull_request')
 require File.join(File.dirname(__FILE__), 'repo')
+require File.join(File.dirname(__FILE__), 'factory')
 
 require File.join(File.dirname(__FILE__), '..', 'config')
 
@@ -26,15 +26,6 @@ module Flow
         end
 
         ask_for_reviews
-      end
-
-      def octokit_client
-        @__octokit_client__ ||= begin
-          Octokit::Client.new(
-              :login    => config['github']['login'],
-              :password => config['github']['password']
-          )
-        end
       end
 
       protected
@@ -109,7 +100,7 @@ module Flow
       end
 
       def open_pull_requests
-        Repo.new(octokit_client, @repo_name).pull_requests
+        Repo.new(@repo_name).pull_requests
       end
 
       def elapsed_time_file_name
@@ -121,7 +112,7 @@ module Flow
       end
 
       def repo
-        @__repo__ ||= Repo.new(octokit_client, @repo_name)
+        @__repo__ ||= Repo.new(@repo_name)
       end
 
       def valid_repos
@@ -129,7 +120,7 @@ module Flow
           repos = []
           unless config['projects'].nil? or config['projects'].keys.nil?
             config['projects'].keys.each do |repo|
-              repos << Repo.new(octokit_client, repo)
+              repos << Repo.new(repo)
             end
           end
           repos

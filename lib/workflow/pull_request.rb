@@ -3,10 +3,9 @@ require File.join(File.dirname(__FILE__), 'factory')
 module Flow
   module Workflow
     class PullRequest
-      attr_accessor :client, :repo, :pull, :jira
+      attr_accessor :repo, :pull, :jira
 
-      def initialize(client, repo, pull)
-        @client = client
+      def initialize(repo, pull)
         @repo   = repo
         @pull   = pull
       end
@@ -49,6 +48,10 @@ module Flow
 
       def ci(repo)
         Flow::Workflow::Factory.instanceFor(repo, :ci)
+      end
+
+      def client
+        @__client__ ||= Flow::Workflow::Factory.instanceFor(@repo.name, :scm)
       end
 
       def all_repos_on_status?(repos = [], status = :success)

@@ -128,7 +128,6 @@ module Flow
 
       def comment_not_green(extra_message)
         message = "Pull request is not OK :disappointed_relieved:"
-        require 'debugger'; debugger
         if comments.empty?
           comment! "**#{message}** \n #{extra_message}"
         elsif !comments.last.attrs[:body].include? message

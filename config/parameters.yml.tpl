@@ -1,11 +1,4 @@
 parameters:
-  hipchat:
-    token: my_hipchat_token
-    room: my_hipchat_room
-    uat_room: my_hipchat_room
-    default_user: Mr Deploy
-    days: 12345
-    hours: 9-18
   github:
     login: github_login
     password: github_password
@@ -39,6 +32,14 @@ parameters:
           ready_uat: id_ready_uat
           uat_nok: id_uat_ko
           done: id_to_done
+      not:
+        class_name: Hipchat
+        token: my_hipchat_token
+        room: my_hipchat_room
+        uat_room: my_hipchat_room
+        default_user: Mr Deploy
+        days: 12345
+        hours: 9-18
     kodify/repo2:
       ci:
         class_name: 'Scrutinizer'
@@ -56,6 +57,14 @@ parameters:
           ready_uat: id_ready_uat
           uat_nok: id_uat_ko
           done: id_to_done
+      not:
+        class_name: Hipchat
+        token: my_hipchat_token
+        room: my_hipchat_room
+        uat_room: my_hipchat_room
+        default_user: Mr Deploy
+        days: 12345
+        hours: 9-18
     kodify/repo3:
       ci:
         class_name: 'Jenkins'
@@ -70,3 +79,11 @@ parameters:
           ready_uat: id_ready_uat
           uat_nok: id_uat_ko
           done: id_to_done
+      not:
+        class_name: Hipchat
+        token: my_hipchat_token
+        room: my_hipchat_room
+        uat_room: my_hipchat_room
+        default_user: Mr Deploy
+        days: 12345
+        hours: 9-18

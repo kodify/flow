@@ -1,10 +1,11 @@
 require 'spec_helper'
+require File.join(base_path, 'lib', 'workflow', 'notifier', 'hipchat')
 
-
-describe 'Flow::Workflow::Notifier' do
+describe 'Flow::Workflow::Hipchat' do
 
   let!(:thor)     { nil }
-  let!(:subject)  { Flow::Workflow::Notifier.new(thor) }
+  let!(:config)   { {  } }
+  let!(:subject)  { Flow::Workflow::Hipchat.new(config, thor: thor) }
 
   describe '#working_hours?' do
     let!(:days)         { '12345' }

@@ -3,7 +3,7 @@ module Flow
     module ContinuousIntegration
       attr_accessor :config
 
-      def initialize(config)
+      def initialize(config, options = {})
         @config = config
       end
 

@@ -8,7 +8,7 @@ module Flow
       extend Flow::Workflow::ContinuousIntegration
       attr_accessor :config
 
-      def initialize(config)
+      def initialize(config, options = {})
         @config = config
       end
 
@@ -110,7 +110,7 @@ module Flow
 
         metrics_on_repo = config['metrics']
         metrics_on_repo.keys.all? do |key|
-          metrics(status)[key].to_f > metrics_on_repo[key].to_f
+          metrics(status)[key].to_f <= metrics_on_repo[key].to_f
         end
       end
 

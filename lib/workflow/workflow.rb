@@ -1,7 +1,6 @@
 require 'octokit'
 require 'digest/md5'
 
-require File.join(File.dirname(__FILE__), 'notifier')
 require File.join(File.dirname(__FILE__), 'pull_request')
 require File.join(File.dirname(__FILE__), 'repo')
 
@@ -119,6 +118,7 @@ module Flow
 
       def notifier
         @__notifier__ ||= Flow::Workflow::Notifier.new @thor
+        @__notifier__ ||= Flow::Workflow::Factory.instanceFor(repo, :not, thor: self)
       end
 
       def repo

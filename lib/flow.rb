@@ -4,7 +4,6 @@ require 'thor'
 require File.join(File.dirname(__FILE__), 'config')
 require File.join(File.dirname(__FILE__), 'workflow/factory')
 require File.join(File.dirname(__FILE__), 'workflow/workflow')
-require File.join(File.dirname(__FILE__), 'workflow/notifier')
 
 def current_path
   @current_path ||= File.expand_path(File.dirname(__FILE__) + '/..')
@@ -65,7 +64,7 @@ E
   end
 
   def notifier
-    @__notifier__ ||= Flow::Workflow::Notifier.new self
+    @__notifier__ ||= Flow::Workflow::Factory.instanceFor(repo, :not, thor: self)
   end
 
   def config

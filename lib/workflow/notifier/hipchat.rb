@@ -2,12 +2,12 @@ require 'hipchat'
 
 module Flow
   module Workflow
-    class Notifier
-
+    class Hipchat
       attr_accessor :room
 
-      def initialize(thor_instance)
-        @thor = thor_instance
+      def initialize(config, options = {})
+        @config = config
+        @thor   = options[:thor]
       end
 
       def say_green_balls
@@ -51,9 +51,9 @@ module Flow
       end
 
       def working_hours?
-        return false unless config['days'].to_s.include? week_day.to_s
+        return false unless @config['days'].to_s.include? week_day.to_s
 
-        hours = config['hours'].split('-')
+        hours = @config['hours'].split('-')
 
         return false if hours.first.to_i > current_hour
         return false if hours.last.to_i < current_hour
@@ -70,19 +70,15 @@ module Flow
       end
 
       def default_user
-        config['default_user']
+        @config['default_user']
       end
 
       def room
-        @room ||= config['room']
+        @room ||= @config['room']
       end
 
       def client
-        HipChat::Client.new(config['token'])
-      end
-
-      def config
-        @__config__ = Flow::Config.get['hipchat']
+        HipChat::Client.new(@config['token'])
       end
 
       def random_user

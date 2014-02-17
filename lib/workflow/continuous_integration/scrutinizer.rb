@@ -8,7 +8,7 @@ module Flow
       extend Flow::Workflow::ContinuousIntegration
       attr_accessor :config
 
-      def initialize(config)
+      def initialize(config, options = {})
         @config = config
       end
 

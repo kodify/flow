@@ -6,7 +6,7 @@ module Flow
     class Jira
       attr_accessor :min_unassigned_uats
 
-      def initialize(config)
+      def initialize(config, options = {})
         @url                  = config['url']
         @user                 = config['user']
         @pass                 = config['pass']

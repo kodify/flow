@@ -117,12 +117,11 @@ module Flow
       end
 
       def notifier
-        @__notifier__ ||= Flow::Workflow::Notifier.new @thor
-        @__notifier__ ||= Flow::Workflow::Factory.instanceFor(repo, :not, thor: self)
+        @__notifier__ ||= Flow::Workflow::Factory.instanceFor(@repo_name, :not, thor: @thor)
       end
 
       def repo
-        @__repo__ ||= Repo.new(octokit_client, repo)
+        @__repo__ ||= Repo.new(octokit_client, @repo_name)
       end
 
       def valid_repos

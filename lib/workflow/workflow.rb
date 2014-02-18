@@ -9,7 +9,7 @@ require File.join(File.dirname(__FILE__), '..', 'config')
 module Flow
   module Workflow
     class Workflow
-      attr_accessor :__notifier__
+      attr_accessor :__notifier__, :repo_name
 
       def initialize(thor_instance = nil)
         @thor = thor_instance
@@ -31,19 +31,22 @@ module Flow
       protected
 
       def process_pull_request(pr)
-        if pr.status == :success #and pr.all_repos_on_status?(valid_repos)
-          pr.save_comments_to_be_discussed
-          integrate_pull_request pr
-        elsif pr.status == :uat_ko
-          pr.to_in_progress jira
-        elsif pr.status == :not_uat and pr.all_repos_on_status?(valid_repos, :not_uat)
-          pr.to_uat jira
-        elsif pr.status == :not_reviewed
-          @pr_to_be_reviewed << pr
-        elsif pr.status == :pending
-          notifier.say_cant_merge pr
-        else
-          notifier.say_cant_merge pr
+        case pr.status
+          when :success
+            # and pr.all_repos_on_status?(valid_repos)
+            pr.save_comments_to_be_discussed
+            integrate_pull_request pr
+          when :uat_ko
+            pr.to_in_progress jira
+          when :not_uat
+            # and pr.all_repos_on_status?(valid_repos, :not_uat)
+            pr.to_uat jira
+          when :not_reviewed
+            @pr_to_be_reviewed << pr
+          when :pending
+            notifier.say_cant_merge pr
+          else
+            notifier.say_cant_merge pr
         end
       end
 
@@ -128,7 +131,7 @@ module Flow
       end
 
       def jira
-        @__jira__ ||= Flow::Workflow::Factory.instanceFor(repo, :it)
+        @__jira__ ||= Flow::Workflow::Factory.instanceFor(@repo_name, :it)
       end
 
       def config

@@ -18,6 +18,7 @@ describe Flow::Workflow::Workflow do
     let!(:merge)    { true }
 
     before do
+      subject.repo_name = repo
       subject.stub(:big_build).and_return(nil)
       subject.__notifier__ = notifier
       subject.send(:integrate_pull_request, pr)
@@ -50,7 +51,7 @@ describe Flow::Workflow::Workflow do
 
   describe '#flow' do
 
-    let!(:repo_name)      { 'supu' }
+    let!(:repo_name)      { 'kodify/repo3' }
     let!(:all_prs)        { [ pr ] }
     let!(:status)         { :success }
     let!(:config)         do

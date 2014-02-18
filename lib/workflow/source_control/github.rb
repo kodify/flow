@@ -38,8 +38,8 @@ module Flow
       def client
         @__octokit_client__ ||= begin
           Octokit::Client.new(
-              :login    => config['login'],
-              :password => config['password']
+              :login    => @config['login'],
+              :password => @config['password']
           )
         end
       end

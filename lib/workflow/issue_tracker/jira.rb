@@ -11,7 +11,7 @@ module Flow
         return :fail unless @status.keys.include?(status_id)
         return :fail unless issue.is_a? String
         json = data_for_move status_id
-        url  = issue_url(issue, status_id)
+        url  = issue_url_with_status(issue, status_id)
         curl(@user, @pass, json, url)
       end
 
@@ -50,13 +50,14 @@ module Flow
         end
       end
 
-      def issue_url(issue, status_id)
-        "#{@url}/rest/api/latest/issue/#{issue}/transitions\?expand\=transitions.fields\&transitionId\=#{@status[status_id]}"
-      end
-
       def data_for_move(status_id)
         "{\"transition\":{\"id\" : \"#{@status[status_id]}\"}}"
       end
+
+      def issue_url_with_status(issue, status_id)
+        "#{@url}/rest/api/latest/issue/#{issue}/transitions\?expand\=transitions.fields\&transitionId\=#{@status[status_id]}"
+      end
+
     end
   end
 end

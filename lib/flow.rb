@@ -37,18 +37,18 @@ E
     issues = jira.issues_by_status('UAT')
     issues_unassigned_on_uat = []
     html_message = ""
-    issue_url = jira.issue_url
 
     issues.each do |issue|
       if issue['fields']['assignee'].nil?
-        html_message += "<br /> <a href='#{issue_url}#{issue['key']}'>#{issue['key']}</a> -  #{issue['fields']['summary']}"
+        url = "#{jira.url}#{issue['key']}"
+        html_message += "<br /> <a href='#{url}'>#{issue['key']}</a> -  #{issue['fields']['summary']}"
         issues_unassigned_on_uat << issue['fields']['assignee']
       end
     end
 
     if issues_unassigned_on_uat.length >= jira.min_unassigned_uats
       html_message = "There are #{issues_unassigned_on_uat.length} PR ready to be uated in #{@repo_name} repo: #{html_message}"
-      notifier.room = config['hipchat']['uat_room']
+      notifier.room = config['projects'].first[1]['not']['uat_room']
       notifier.say html_message, :notify => true, :message_format => 'html'
     end
   end
@@ -59,11 +59,11 @@ E
     Flow::Workflow::Factory.instanceFor(repo, :ci)
   end
 
-  def jira(repo)
+  def jira(repo = config['projects'].keys.first)
     @__jira__ ||= Flow::Workflow::Factory.instanceFor(repo, :it)
   end
 
-  def notifier
+  def notifier(repo = config['projects'].keys.first)
     @__notifier__ ||= Flow::Workflow::Factory.instanceFor(repo, :not, thor: self)
   end
 

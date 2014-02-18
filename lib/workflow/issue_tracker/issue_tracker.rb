@@ -1,7 +1,7 @@
 module Flow
   module Workflow
     class IssueTracker
-      attr_accessor :min_unassigned_uats
+      attr_accessor :min_unassigned_uats, :url
 
       def initialize(config, options = {})
         @url                  = config['url']

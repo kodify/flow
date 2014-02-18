@@ -1,15 +1,15 @@
-require 'octokit'
 require 'digest/md5'
 
 require File.join(File.dirname(__FILE__), 'pull_request')
 require File.join(File.dirname(__FILE__), 'repo')
+require File.join(File.dirname(__FILE__), 'factory')
 
 require File.join(File.dirname(__FILE__), '..', 'config')
 
 module Flow
   module Workflow
     class Workflow
-      attr_accessor :__notifier__
+      attr_accessor :__notifier__, :repo_name
 
       def initialize(thor_instance = nil)
         @thor = thor_instance
@@ -28,31 +28,25 @@ module Flow
         ask_for_reviews
       end
 
-      def octokit_client
-        @__octokit_client__ ||= begin
-          Octokit::Client.new(
-              :login    => config['github']['login'],
-              :password => config['github']['password']
-          )
-        end
-      end
-
       protected
 
       def process_pull_request(pr)
-        if pr.status == :success #and pr.all_repos_on_status?(valid_repos)
-          pr.save_comments_to_be_discussed
-          integrate_pull_request pr
-        elsif pr.status == :uat_ko
-          pr.to_in_progress jira
-        elsif pr.status == :not_uat and pr.all_repos_on_status?(valid_repos, :not_uat)
-          pr.to_uat jira
-        elsif pr.status == :not_reviewed
-          @pr_to_be_reviewed << pr
-        elsif pr.status == :pending
-          notifier.say_cant_merge pr
-        else
-          notifier.say_cant_merge pr
+        case pr.status
+          when :success
+            # and pr.all_repos_on_status?(valid_repos)
+            pr.save_comments_to_be_discussed
+            integrate_pull_request pr
+          when :uat_ko
+            pr.to_in_progress jira
+          when :not_uat
+            # and pr.all_repos_on_status?(valid_repos, :not_uat)
+            pr.to_uat jira
+          when :not_reviewed
+            @pr_to_be_reviewed << pr
+          when :pending
+            notifier.say_cant_merge pr
+          else
+            notifier.say_cant_merge pr
         end
       end
 
@@ -109,7 +103,7 @@ module Flow
       end
 
       def open_pull_requests
-        Repo.new(octokit_client, @repo_name).pull_requests
+        Repo.new(@repo_name).pull_requests
       end
 
       def elapsed_time_file_name
@@ -121,7 +115,7 @@ module Flow
       end
 
       def repo
-        @__repo__ ||= Repo.new(octokit_client, @repo_name)
+        @__repo__ ||= Repo.new(@repo_name)
       end
 
       def valid_repos
@@ -129,7 +123,7 @@ module Flow
           repos = []
           unless config['projects'].nil? or config['projects'].keys.nil?
             config['projects'].keys.each do |repo|
-              repos << Repo.new(octokit_client, repo)
+              repos << Repo.new(repo)
             end
           end
           repos
@@ -137,7 +131,7 @@ module Flow
       end
 
       def jira
-        @__jira__ ||= Flow::Workflow::Factory.instanceFor(repo, :it)
+        @__jira__ ||= Flow::Workflow::Factory.instanceFor(@repo_name, :it)
       end
 
       def config

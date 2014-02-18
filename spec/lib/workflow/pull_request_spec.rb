@@ -8,7 +8,7 @@ describe 'PullRequest' do
   let!(:keyword)    { '' }
   let!(:title)      { "#{keyword} me" }
 
-  let!(:subject)    { Flow::Workflow::PullRequest.new(client, repo, pull) }
+  let!(:subject)    { Flow::Workflow::PullRequest.new(repo, pull) }
 
   describe '#ignore' do
     let!(:keyword)    { '[IGNORE]' }

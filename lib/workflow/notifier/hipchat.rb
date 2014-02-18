@@ -1,14 +1,9 @@
 require 'hipchat'
+require File.join(File.dirname(__FILE__), 'notifier')
 
 module Flow
   module Workflow
-    class Hipchat
-      attr_accessor :room
-
-      def initialize(config, options = {})
-        @config = config
-        @thor   = options[:thor]
-      end
+    class Hipchat < Flow::Workflow::Notifier
 
       def say_green_balls
         say 'Hey master has green balls, lets go for a deploy?!', :notify => true

@@ -18,6 +18,7 @@ describe Flow::Workflow::Workflow do
     let!(:merge)    { true }
 
     before do
+      subject.repo_name = repo
       subject.stub(:big_build).and_return(nil)
       subject.__notifier__ = notifier
       subject.send(:integrate_pull_request, pr)
@@ -50,7 +51,7 @@ describe Flow::Workflow::Workflow do
 
   describe '#flow' do
 
-    let!(:repo_name)      { 'supu' }
+    let!(:repo_name)      { 'kodify/repo3' }
     let!(:all_prs)        { [ pr ] }
     let!(:status)         { :success }
     let!(:config)         do
@@ -66,7 +67,7 @@ describe Flow::Workflow::Workflow do
     end
     let!(:interval)       { 1 }
     let!(:pending_pr)     { 10 }
-    let!(:octokit_client) { double('octokit_client') }
+    let!(:scm_client) { double('octokit_client') }
     let!(:notifier)       { double('notifier', say_processing: nil) }
     let!(:ignore)         { false }
     let!(:success_on_all_repos) { true }
@@ -86,7 +87,7 @@ describe Flow::Workflow::Workflow do
       subject.stub(:open_pull_requests).and_return all_prs
       subject.stub(:big_build).and_return true
       subject.stub(:config).and_return config
-      subject.stub(:octokit_client).and_return octokit_client
+      subject.stub(:scm_client).and_return scm_client
       subject.stub(:notifier).and_return notifier
       subject.stub(:integrate_pull_request).and_return true
       subject.stub(:ask_for_reviews).and_return true

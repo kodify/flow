@@ -1,21 +1,11 @@
 require 'rubygems'
 require 'rest_client'
 
+require File.join(File.dirname(__FILE__), 'issue_tracker')
+
 module Flow
   module Workflow
-    class Jira
-      attr_accessor :min_unassigned_uats
-
-      def initialize(config, options = {})
-        @url                  = config['url']
-        @user                 = config['user']
-        @pass                 = config['pass']
-        @min_unassigned_uats  = config['min_unassigned_uats']
-        @status               = { ready_uat:  config['transitions']['ready_uat'],
-                                  uat_nok:    config['transitions']['uat_nok'],
-                                  done:       config['transitions']['done'] }
-
-      end
+    class Jira < Flow::Workflow::IssueTracker
 
       def do_move(status_id, issue)
         return :fail unless @status.keys.include?(status_id)

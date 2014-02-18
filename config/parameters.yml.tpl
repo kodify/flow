@@ -1,7 +1,4 @@
 parameters:
-  github:
-    login: github_login
-    password: github_password
   flow:
     pending_pr_to_notify: 3
     pending_pr_interval_in_sec: 1800
@@ -33,13 +30,18 @@ parameters:
           uat_nok: id_uat_ko
           done: id_to_done
       not:
-        class_name: Hipchat
+        class_name: 'Hipchat'
         token: my_hipchat_token
         room: my_hipchat_room
         uat_room: my_hipchat_room
         default_user: Mr Deploy
         days: 12345
         hours: 9-18
+      source_control:
+        class_name: Github
+        login: github_login
+        password: github_password
+        valid_repos: [ 'kodify/rule34', 'kodify/kumm', 'kodify/katt', 'kodify/CPP' ]
     kodify/repo2:
       ci:
         class_name: 'Scrutinizer'
@@ -58,13 +60,18 @@ parameters:
           uat_nok: id_uat_ko
           done: id_to_done
       not:
-        class_name: Hipchat
+        class_name: 'Hipchat'
         token: my_hipchat_token
         room: my_hipchat_room
         uat_room: my_hipchat_room
         default_user: Mr Deploy
         days: 12345
         hours: 9-18
+      source_control:
+        class_name: Github
+        login: github_login
+        password: github_password
+        valid_repos: [ 'kodify/rule34', 'kodify/kumm', 'kodify/katt', 'kodify/CPP' ]
     kodify/repo3:
       ci:
         class_name: 'Jenkins'
@@ -80,10 +87,15 @@ parameters:
           uat_nok: id_uat_ko
           done: id_to_done
       not:
-        class_name: Hipchat
+        class_name: 'Hipchat'
         token: my_hipchat_token
         room: my_hipchat_room
         uat_room: my_hipchat_room
         default_user: Mr Deploy
         days: 12345
         hours: 9-18
+      source_control:
+        class_name: Github
+        login: github_login
+        password: github_password
+        valid_repos: [ 'kodify/rule34', 'kodify/kumm', 'kodify/katt', 'kodify/CPP' ]

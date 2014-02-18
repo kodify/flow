@@ -4,13 +4,7 @@ require File.join(File.dirname(__FILE__), 'continuous_integration')
 
 module Flow
   module Workflow
-    class Scrutinizer
-      extend Flow::Workflow::ContinuousIntegration
-      attr_accessor :config
-
-      def initialize(config, options = {})
-        @config = config
-      end
+    class Scrutinizer < Flow::Workflow::ContinuousIntegration
 
       def is_green?(pr)
         @__green__ ||= {}

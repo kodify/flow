@@ -37,7 +37,7 @@ module Flow
       end
 
       def client
-        @__client__ ||= Flow::Workflow::Factory.instanceFor(@name, :source_control)
+        @__client__ ||= Flow::Workflow::Factory.instance(@name, :source_control)
       end
     end
   end

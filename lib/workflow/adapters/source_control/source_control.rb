@@ -1,10 +1,8 @@
+require File.join(File.dirname(__FILE__), '..', 'adapter')
+
 module Flow
   module Workflow
-    class SourceControl
-
-      def initialize(config, options = {})
-        @config = config
-      end
+    class SourceControl < Flow::Workflow::Adapter
 
       def add_comment(repo, number, body)
         raise 'Method #add_comment not implemented'

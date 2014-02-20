@@ -33,34 +33,36 @@ parameters:
       login: github_login
       password: github_password
       valid_repos: [ 'kodify/rule34', 'kodify/kumm', 'kodify/katt', 'kodify/CPP' ]
+    jenkins:
+      class_name: Jenkins
   projects:
     kodify/repo1:
       ci:
-        class_name: 'Jenkins'
+        jenkins:
       it:
-        adapter: jira
+        jira:
       not:
-        adapter: hipchat
+        hipchat:
       source_control:
-        adapter: github
+        github:
     kodify/repo2:
       ci:
-        class_name: 'Scrutinizer'
-        metrics:
-          xxxx: 'threshold'
-          yyyy: 'threshold'
+        scrutinizer:
+          metrics:
+            xxxx: 'threshold'
+            yyyy: 'threshold'
       it:
-        adapter: jira
+        jira:
       not:
-        adapter: hipchat
+        hipchat:
       source_control:
-        adapter: github
+        github:
     kodify/repo3:
       ci:
-        class_name: 'Jenkins'
+        jenkins:
       it:
-        adapter: jira
+        jira:
       not:
-        adapter: hipchat
+        hipchat:
       source_control:
-        adapter: github
+        github:

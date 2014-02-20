@@ -10,7 +10,7 @@ module Flow
         @__green__ ||= {}
         unless @__green__.include? pr.original_branch
           @__green__[pr.original_branch] = begin
-            build_green?(pr) && scrutinizer_green?(pr)
+            green?(pr)
           rescue Exception => e
             false
           end
@@ -23,13 +23,7 @@ module Flow
 
       protected
 
-      def build_green?(pr)
-        status = last_travis_status pr
-        return unless status
-        return status.state == 'success'
-      end
-
-      def scrutinizer_green?(pr)
+      def green?(pr)
         metrics             = valid_metrics?(pr)
         status              = last_scrutinizer_github_status(pr)
         scrutinizer_status  = inspection_status(pr)
@@ -69,10 +63,6 @@ module Flow
         statuses.any? do |state|
           return state if state.description.include? pattern
         end
-      end
-
-      def last_travis_status(pr)
-        last_status(pr, 'The Travis CI')
       end
 
       def last_scrutinizer_github_status(pr)

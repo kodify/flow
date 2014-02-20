@@ -77,7 +77,7 @@ describe Flow::Workflow::Workflow do
           to_in_progress: true,
           to_uat: true,
           save_comments_to_be_discussed: true,
-          ignore: ignore,
+          ignore?: ignore,
           all_repos_on_status?: success_on_all_repos,
           commentNotGreen: nil,
       } )

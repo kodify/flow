@@ -1,5 +1,6 @@
 require 'octokit'
 require File.join(File.dirname(__FILE__), 'source_control')
+require File.join(File.dirname(__FILE__), '..', '..', 'pull_request')
 
 module Flow
   module Workflow
@@ -25,8 +26,17 @@ module Flow
         client.create_issue name, title, body, options
       end
 
-      def pull_requests(name)
-        client.pull_requests name
+      def pull_requests(repo)
+        client.pull_requests(repo.name).map do |pull|
+          PullRequest.new(repo,
+                          id:         pull.id,
+                          sha:        pull.head.attrs[:sha],
+                          title:      pull.title,
+                          number:     pull.number,
+                          branch:     pull.head[:label].split(':')[1],
+                          comments:   pull.rels[:comments].get.data,
+          )
+        end
       end
 
       def issues(name)

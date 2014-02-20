@@ -19,7 +19,7 @@ module Flow
         @pr_to_be_reviewed = []
         @repo_name = repo_name
         open_pull_requests.each do |pr|
-          if !pr.ignore
+          if !pr.ignore?
             notifier.say_processing pr
             process_pull_request pr
           end
@@ -76,8 +76,8 @@ module Flow
         message = html_message = "There are #{qty} PR ready to be reviewed in #{@repo_name} repo:"
 
         @pr_to_be_reviewed.each do |pr|
-            message += "\n  #{pr.original_branch} - https://github.com/#{@repo_name}/pull/#{pr.number} "
-            html_message += "<br> - #{pr.original_branch} - <a href=\"https://github.com/#{repo_name}/pull/#{pr.number}\">https://github.com/#{@repo_name}/pull/#{pr.number}</a>"
+            message += "\n  #{pr.branch} - https://github.com/#{@repo_name}/pull/#{pr.number} "
+            html_message += "<br> - #{pr.branch} - <a href=\"https://github.com/#{repo_name}/pull/#{pr.number}\">https://github.com/#{@repo_name}/pull/#{pr.number}</a>"
         end
 
         notifier.say html_message, :notify => true, :message_format => 'html'
@@ -110,10 +110,6 @@ module Flow
         @__file_name__ = '/tmp/flow_pending_pr_' + Digest::MD5.hexdigest(@repo_name)
       end
 
-      def notifier
-        @__notifier__ ||= Flow::Workflow::Factory.instance(@repo_name, :notifier, thor: @thor)
-      end
-
       def repo
         @__repo__ ||= Repo.new(@repo_name)
       end
@@ -128,6 +124,10 @@ module Flow
           end
           repos
         end
+      end
+
+      def notifier
+        @__notifier__ ||= Flow::Workflow::Factory.instance(@repo_name, :notifier, thor: @thor)
       end
 
       def jira

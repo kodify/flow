@@ -8,8 +8,8 @@ module Flow
 
       def is_green?(pr)
         @__green__ ||= {}
-        unless @__green__.include? pr.original_branch
-          @__green__[pr.original_branch] = begin
+        unless @__green__.include? pr.branch
+          @__green__[pr.branch] = begin
             green?(pr)
           rescue Exception => e
             false

@@ -16,11 +16,11 @@ describe 'Flow::Workflow::Jenkins' do
     let!(:builds_by_branch_name)  { { "origin/#{branch}" => { 'revision' => { 'SHA1' => last_green_commit }}} }
     let!(:last_master_commit)     { 'supu' }
     let!(:last_green_commit)      { 'supu' }
-    let!(:pr)                     { Flow::Workflow::PullRequest.new(nil, nil) }
+    let!(:pr)                     { Flow::Workflow::PullRequest.new(nil, {}) }
 
     before do
       pr.stub(:repo_name).and_return(repo)
-      pr.stub(:original_branch).and_return(branch)
+      pr.stub(:branch).and_return(branch)
       subject.stub(:last_stable_build).and_return(last_stable_build)
       subject.stub(:last_master_commit).and_return(last_master_commit)
     end

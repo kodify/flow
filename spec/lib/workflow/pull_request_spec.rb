@@ -8,9 +8,19 @@ describe 'PullRequest' do
   let!(:keyword)    { '' }
   let!(:title)      { "#{keyword} me" }
 
-  let!(:subject)    { Flow::Workflow::PullRequest.new(repo, pull) }
+  let!(:subject) do
+    Flow::Workflow::PullRequest.new(repo,
+                    id:         '1',
+                    sha:        'sha',
+                    title:      title,
+                    number:     'number',
+                    branch:     'branch',
+                    comments:   [ 'a', 'b' ],
+    )
 
-  describe '#ignore' do
+  end
+
+  describe '#ignore?' do
     let!(:keyword)    { '[IGNORE]' }
     let!(:dictionary) { { 'ignore' => keyword } }
 
@@ -20,14 +30,14 @@ describe 'PullRequest' do
 
     describe 'title contains ignore keyword' do
       it 'should be ignorable' do
-        subject.send(:ignore).should be_true
+        subject.send(:ignore?).should be_true
       end
     end
 
     describe 'title contains ignore keyword' do
       let!(:title) { 'Do not be ignored' }
       it 'should not be ignored' do
-        subject.send(:ignore).should be_false
+        subject.send(:ignore?).should be_false
       end
     end
   end

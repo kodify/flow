@@ -3,11 +3,16 @@ require File.join(File.dirname(__FILE__), 'factory')
 module Flow
   module Workflow
     class PullRequest
-      attr_accessor :repo, :pull, :jira
+      attr_accessor :repo, :pull, :jira, :id, :title, :number, :branch, :sha, :comments
 
-      def initialize(repo, pull)
-        @repo   = repo
-        @pull   = pull
+      def initialize(repo, properties)
+        @repo     = repo
+        @id       = properties[:id]
+        @sha      = properties[:sha]
+        @title    = properties[:title]
+        @number   = properties[:number]
+        @branch   = properties[:branch]
+        @comments = properties[:comments]
       end
 
       def status
@@ -46,6 +51,10 @@ module Flow
         ci(repo.name).is_green?(self)
       end
 
+      def ignore?
+        @title.include? dictionary['ignore']
+      end
+
       def statuses
         @__statuses__ ||= {}
         @__statuses__[repo.name] ||= {}
@@ -61,33 +70,20 @@ module Flow
         true
       end
 
-      def comments
-        @__comments__ ||= []
-        @__comments__[pull.id] ||= pull.rels[:comments].get.data
-      end
-
       def merge
-        message = "#{original_branch} #UAT-OK - PR #{number} merged"
-        response = scm.merge_pull_request(repo.name, pull.number, message)
+        message = "#{@branch} #UAT-OK - PR #{number} merged"
+        response = scm.merge_pull_request(repo.name, @number, message)
         response['merged']
       rescue
         false
       end
 
       def delete_original_branch
-        scm.delete_ref(repo.name, "heads/#{original_branch}") unless original_branch.include? 'master'
-      end
-
-      def original_branch
-        @__original_branch__ ||= pull.head[:label].split(':')[1]
-      end
-
-      def number
-        pull.number
+        scm.delete_ref(repo.name, "heads/#{@branch}") unless @branch.include? 'master'
       end
 
       def jira_id
-        original_branch.match('([a-zA-Z]{2,3})-([0-9]{1,})')
+        @branch.match('([a-zA-Z]{2,3})-([0-9]{1,})').to_s
       end
 
       def save_comments_to_be_discussed
@@ -98,7 +94,7 @@ module Flow
       end
 
       def issue_id(comment)
-        "[#{original_branch}:#{comment.id}]"
+        "[#{@branch}:#{comment.id}]"
       end
 
       def ship_it!
@@ -110,7 +106,7 @@ module Flow
       end
 
       def comment!(body)
-        scm.add_comment(repo.name, pull.number, body)
+        scm.add_comment(repo.name, @number, body)
       end
 
       def comment_not_green(extra_message)
@@ -140,18 +136,6 @@ module Flow
         end
       end
 
-      def dictionary
-        @__dictionary__ ||= Flow::Config.get['dictionary']
-      end
-
-      def ignore
-        pull.title.include? dictionary['ignore']
-      end
-
-      def sha
-        pull.head.attrs[:sha]
-      end
-
       def repo_name
         repo.name
       end
@@ -162,6 +146,10 @@ module Flow
         patterns.any? do |pattern|
           comments.any? { |s| s.body.include?(pattern) }
         end
+      end
+
+      def dictionary
+        @__dictionary__ ||= Flow::Config.get['dictionary']
       end
 
       def ci(repo)

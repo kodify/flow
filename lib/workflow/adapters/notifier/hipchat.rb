@@ -14,11 +14,11 @@ module Flow
       end
 
       def say_processing(pr)
-        @thor.say "Processing: #{pr.original_branch}"
+        @thor.say "Processing: #{pr.branch}"
       end
 
       def say_merged(pr)
-        @thor.say "\tMerged (#{pr.number}) and deleted branch #{pr.original_branch}", 'green'
+        @thor.say "\tMerged (#{pr.number}) and deleted branch #{pr.branch}", 'green'
       end
 
       def say_cant_merge(pr)

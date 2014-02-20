@@ -7,11 +7,11 @@ module Flow
 
       def is_green?(pr)
         @__green__ ||= {}
-        unless @__green__.include? pr.original_branch
-          @__green__[pr.original_branch] = begin
-            master_commit = last_master_commit(pr.repo_name, pr.original_branch)
+        unless @__green__.include? pr.branch
+          @__green__[pr.branch] = begin
+            master_commit = last_master_commit(pr.repo_name, pr.branch)
             return true if master_commit.nil?
-            master_commit == last_stable_commit(pr.original_branch)
+            master_commit == last_stable_commit(pr.branch)
           end
         end
       end

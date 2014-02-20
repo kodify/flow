@@ -8,7 +8,7 @@ module Flow
       end
 
       def pull_requests
-        @__pull_requests__ ||= pulls
+        pulls
       end
 
       def pull_request_by_name(name)
@@ -27,13 +27,11 @@ module Flow
       protected
 
       def pulls
-        scm.pull_requests(@name).map do |pull|
-          PullRequest.new(self, pull)
-        end
+        @__pull_requests__ ||= scm.pull_requests self
       end
 
       def issues
-        scm.issues(@name)
+        @__issues__ ||= scm.issues @name
       end
 
       def scm

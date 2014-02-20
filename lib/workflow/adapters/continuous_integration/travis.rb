@@ -3,15 +3,15 @@ module Flow
     class Travis < Flow::Workflow::ContinuousIntegration
       def is_green?(pr)
         @__green__ ||= {}
-        unless @__green__.include? pr.original_branch
-          @__green__[pr.original_branch] = build_status? pr, 'success'
+        unless @__green__.include? pr.branch
+          @__green__[pr.branch] = build_status? pr, 'success'
         end
       end
 
       def pending?(pr)
         @__pending__ ||= {}
-        unless @__pending__.include? pr.original_branch
-          @__pending__[pr.original_branch] = build_status? pr, 'pending'
+        unless @__pending__.include? pr.branch
+          @__pending__[pr.branch] = build_status? pr, 'pending'
         end
       end
 

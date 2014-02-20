@@ -1,5 +1,5 @@
 require 'spec_helper'
-require File.join(base_path, 'lib', 'workflow', 'continuous_integration', 'jenkins')
+require File.join(base_path, 'lib', 'workflow', 'adapters', 'continuous_integration', 'jenkins')
 require File.join(base_path, 'lib', 'workflow', 'pull_request')
 
 

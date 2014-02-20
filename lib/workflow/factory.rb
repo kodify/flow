@@ -1,10 +1,10 @@
 require 'json'
 require File.join(File.dirname(__FILE__), '../config')
-require File.join(File.dirname(__FILE__), 'continuous_integration', 'jenkins')
-require File.join(File.dirname(__FILE__), 'continuous_integration', 'scrutinizer')
-require File.join(File.dirname(__FILE__), 'issue_tracker', 'jira')
-require File.join(File.dirname(__FILE__), 'notifier', 'hipchat')
-require File.join(File.dirname(__FILE__), 'source_control', 'github')
+require File.join(File.dirname(__FILE__), 'adapters', 'continuous_integration', 'jenkins')
+require File.join(File.dirname(__FILE__), 'adapters', 'continuous_integration', 'scrutinizer')
+require File.join(File.dirname(__FILE__), 'adapters', 'issue_tracker', 'jira')
+require File.join(File.dirname(__FILE__), 'adapters', 'notifier', 'hipchat')
+require File.join(File.dirname(__FILE__), 'adapters', 'source_control', 'github')
 
 module Flow
   module Workflow

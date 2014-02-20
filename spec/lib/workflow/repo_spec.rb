@@ -6,9 +6,9 @@ describe 'Repo' do
   let!(:name)     { 'supu' }
   let!(:subject)  { Flow::Workflow::Repo.new(name) }
   let!(:scm)      { Object.new }
-  let!(:pullA)    { double('pullA', head: { label: 'supu:pullA' }, jira_id: 'PULL-A' ) }
-  let!(:pullB)    { double('pullB', head: { label: 'supu:pullA' }, jira_id: 'PULL-B' ) }
-  let!(:pullC)    { double('pullC', head: { label: 'supu:pullA' }, jira_id: 'PULL-C' ) }
+  let!(:pullA)    { double('pullA', head: { label: 'supu:pullA' }, issue_tracker_id: 'PULL-A' ) }
+  let!(:pullB)    { double('pullB', head: { label: 'supu:pullA' }, issue_tracker_id: 'PULL-B' ) }
+  let!(:pullC)    { double('pullC', head: { label: 'supu:pullA' }, issue_tracker_id: 'PULL-C' ) }
   let!(:pulls)    { [pullA, pullB, pullC] }
   let!(:issueA)   { double('issueA', title: 'A') }
   let!(:issueB)   { double('issueB', title: 'B') }

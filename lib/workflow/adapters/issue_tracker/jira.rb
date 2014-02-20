@@ -22,6 +22,10 @@ module Flow
         issues['issues']
       end
 
+      def branch_to_id(branch)
+        branch.match('([a-zA-Z]{2,3})-([0-9]{1,})').to_s
+      end
+
       protected
 
       def curl(user, pass, json, url)

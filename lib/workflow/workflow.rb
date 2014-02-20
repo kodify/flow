@@ -37,10 +37,10 @@ module Flow
             pr.save_comments_to_be_discussed
             integrate_pull_request pr
           when :uat_ko
-            pr.to_in_progress jira
+            pr.to_in_progress!
           when :not_uat
             # and pr.all_repos_on_status?(valid_repos, :not_uat)
-            pr.to_uat jira
+            pr.to_uat!
           when :not_reviewed
             @pr_to_be_reviewed << pr
           when :pending
@@ -56,8 +56,8 @@ module Flow
           return
         end
 
-        pr.delete_original_branch
-        pr.to_done jira
+        pr.delete_branch
+        pr.to_done!
         # FIXME : This is always building fux
         big_build 'fux'
         notifier.say_merged pr
@@ -128,10 +128,6 @@ module Flow
 
       def notifier
         @__notifier__ ||= Flow::Workflow::Factory.instance(@repo_name, :notifier, thor: @thor)
-      end
-
-      def jira
-        @__jira__ ||= Flow::Workflow::Factory.instance(@repo_name, :issue_tracker)
       end
 
       def config

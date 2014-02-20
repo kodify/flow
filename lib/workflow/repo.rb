@@ -12,7 +12,7 @@ module Flow
       end
 
       def pull_request_by_name(name)
-        pulls.find { |pull| pull.jira_id.to_s == name }
+        pulls.find { |pull| pull.issue_tracker_id.to_s == name }
       end
       
       def issue_exists(issue_name)

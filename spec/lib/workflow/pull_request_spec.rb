@@ -43,7 +43,7 @@ describe 'PullRequest' do
   end
 
   describe '#all_repos_on_status?' do
-    let!(:jira_id)      { 'WTF-111' }
+    let!(:issue_tracker_id)      { 'WTF-111' }
     let!(:success)      { double('success_pr', status: :success) }
     let!(:uat_ko)       { double('success_pr', status: :uat_ko) }
     let!(:repo1)        { double('repo1') }
@@ -54,7 +54,7 @@ describe 'PullRequest' do
     before do
       repo1.stub(:pull_request_by_name).and_return(pulls_repo1)
       repo2.stub(:pull_request_by_name).and_return(pulls_repo2)
-      subject.stub(:jira_id).and_return(jira_id)
+      subject.stub(:issue_tracker_id).and_return(issue_tracker_id)
     end
     describe 'when repos does not contain any pull request with this id' do
       it 'should be true' do

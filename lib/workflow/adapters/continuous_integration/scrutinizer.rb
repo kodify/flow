@@ -40,7 +40,7 @@ module Flow
           comment << "Current scrutinizer status - **#{scrutinizer_status['state']}** \n\n Relaunch it at (#{url}) or die!"
         end
 
-        pr.comment_not_green comment if !comment.empty?
+        pr.comment_not_green! comment if !comment.empty?
 
         metrics && status.state == 'success'
       end

@@ -13,7 +13,7 @@ describe Flow::Workflow::Workflow do
   end
 
   describe '#integrate_pull_request' do
-    let!(:pr)       { double('pr', merge: merge, to_done: nil, delete_original_branch: nil, ignore: false) }
+    let!(:pr)       { double('pr', merge: merge, to_done!: nil, delete_branch: nil, ignore: false) }
     let!(:notifier) { double('notifier', say_merged: nil, say_big_build_queued: nil, say_cant_merge: nil) }
     let!(:merge)    { true }
 
@@ -30,10 +30,10 @@ describe Flow::Workflow::Workflow do
 
     describe 'for a valid github response' do
       it 'should delete original branch' do
-        pr.should have_received(:delete_original_branch)
+        pr.should have_received(:delete_branch)
       end
       it 'should mark pr as done' do
-        pr.should have_received(:to_done)
+        pr.should have_received(:to_done!)
       end
       it { should have_received(:big_build) }
       it { notifier.should have_received(:say_merged) }
@@ -74,8 +74,8 @@ describe Flow::Workflow::Workflow do
     let!(:pr) do
       double('pr', {
           status: status,
-          to_in_progress: true,
-          to_uat: true,
+          to_in_progress!: true,
+          to_uat!: true,
           save_comments_to_be_discussed: true,
           ignore?: ignore,
           all_repos_on_status?: success_on_all_repos,
@@ -109,7 +109,7 @@ describe Flow::Workflow::Workflow do
     describe 'for a uat_ko pull request' do
       let!(:status) { :uat_ko }
       it 'pull request should be moved to in progress' do
-        pr.should have_received(:to_in_progress)
+        pr.should have_received(:to_in_progress!)
       end
     end
 
@@ -123,7 +123,7 @@ describe Flow::Workflow::Workflow do
     describe 'for a non uated pull request' do
       let!(:status) { :not_uat }
       it 'pull request should be moved to uat' do
-        pr.should have_received(:to_uat)
+        pr.should have_received(:to_uat!)
       end
     end
 

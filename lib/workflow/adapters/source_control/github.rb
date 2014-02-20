@@ -43,6 +43,11 @@ module Flow
         client.issues name
       end
 
+      def delete_branch(repo, branch)
+        # TODO Add non-deleteable branches config
+        client.delete_ref(repo, "heads/#{branch}")
+      end
+
       protected
 
       def client

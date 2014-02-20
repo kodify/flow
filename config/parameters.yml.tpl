@@ -37,32 +37,32 @@ parameters:
       class_name: Jenkins
   projects:
     kodify/repo1:
-      ci:
+      continuous_integration:
         jenkins:
-      it:
+      issue_tracker:
         jira:
-      not:
+      notifier:
         hipchat:
       source_control:
         github:
     kodify/repo2:
-      ci:
+      continuous_integration:
         scrutinizer:
           metrics:
             xxxx: 'threshold'
             yyyy: 'threshold'
-      it:
+      issue_tracker:
         jira:
-      not:
+      notifier:
         hipchat:
       source_control:
         github:
     kodify/repo3:
-      ci:
+      continuous_integration:
         jenkins:
-      it:
+      issue_tracker:
         jira:
-      not:
+      notifier:
         hipchat:
       source_control:
         github:

@@ -111,7 +111,7 @@ module Flow
       end
 
       def notifier
-        @__notifier__ ||= Flow::Workflow::Factory.instance(@repo_name, :not, thor: @thor)
+        @__notifier__ ||= Flow::Workflow::Factory.instance(@repo_name, :notifier, thor: @thor)
       end
 
       def repo
@@ -131,7 +131,7 @@ module Flow
       end
 
       def jira
-        @__jira__ ||= Flow::Workflow::Factory.instance(@repo_name, :it)
+        @__jira__ ||= Flow::Workflow::Factory.instance(@repo_name, :issue_tracker)
       end
 
       def config

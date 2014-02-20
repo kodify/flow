@@ -14,7 +14,7 @@ describe 'The HelloWorld App' do
 
   before do
     Flow::Workflow::Repo.any_instance.stub(:pull_request_by_name).and_return(pr)
-    Flow::Workflow::Workflow.any_instance.stub(:client).and_return(nil)
+    Flow::Workflow::Workflow.any_instance.stub(:scm).and_return(nil)
   end
 
   describe "/pr/ok" do

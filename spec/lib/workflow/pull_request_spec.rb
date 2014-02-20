@@ -2,7 +2,7 @@ require 'spec_helper'
 require File.join(base_path, 'lib', 'workflow', 'pull_request')
 
 describe 'PullRequest' do
-  let!(:client)     { double('client') }
+  let!(:scm)     { double('client') }
   let!(:repo)       { double('repo') }
   let!(:pull)       { double('pull', title: title) }
   let!(:keyword)    { '' }

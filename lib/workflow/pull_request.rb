@@ -10,12 +10,18 @@ module Flow
         @pull   = pull
       end
 
-      def has_comment_with?(patterns)
-        patterns.any? do |pattern|
-          comments.any? { |s| s.body.include?(pattern) }
+      def status
+        @__status__ ||= begin
+          return :blocked       if blocked?
+          return :pending       if pending?
+          return :failed        if !green?
+          return :not_reviewed  if !reviewed?
+          return :uat_ko        if uat_ko?
+          return :not_uat       if !uat?
+          :success
         end
       end
-      
+
       def blocked?
         has_comment_with?(dictionary['blocked'])
       end
@@ -43,15 +49,7 @@ module Flow
       def statuses
         @__statuses__ ||= {}
         @__statuses__[repo.name] ||= {}
-        @__statuses__[repo.name][sha] ||= client.statuses(repo.name, sha)
-      end
-
-      def ci(repo)
-        Flow::Workflow::Factory.instance(repo, :ci)
-      end
-
-      def client
-        @__client__ ||= Flow::Workflow::Factory.instance(@repo.name, :source_control)
+        @__statuses__[repo.name][sha] ||= scm.statuses(repo.name, sha)
       end
 
       def all_repos_on_status?(repos = [], status = :success)
@@ -63,18 +61,6 @@ module Flow
         true
       end
 
-      def status
-        @__status__ ||= begin
-          return :blocked       if blocked?
-          return :pending       if pending?
-          return :failed        if !green?
-          return :not_reviewed  if !reviewed?
-          return :uat_ko        if uat_ko?
-          return :not_uat       if !uat?
-          :success
-        end
-      end
-
       def comments
         @__comments__ ||= []
         @__comments__[pull.id] ||= pull.rels[:comments].get.data
@@ -82,16 +68,14 @@ module Flow
 
       def merge
         message = "#{original_branch} #UAT-OK - PR #{number} merged"
-        begin
-          response = client.merge_pull_request(repo.name, pull.number, message)
-          response['merged']
-        rescue
-          false
-        end
+        response = scm.merge_pull_request(repo.name, pull.number, message)
+        response['merged']
+      rescue
+        false
       end
 
       def delete_original_branch
-        client.delete_ref(repo.name, "heads/#{original_branch}") unless original_branch.include? 'master'
+        scm.delete_ref(repo.name, "heads/#{original_branch}") unless original_branch.include? 'master'
       end
 
       def original_branch
@@ -126,7 +110,7 @@ module Flow
       end
 
       def comment!(body)
-        client.add_comment(repo.name, pull.number, body)
+        scm.add_comment(repo.name, pull.number, body)
       end
 
       def comment_not_green(extra_message)
@@ -170,6 +154,22 @@ module Flow
 
       def repo_name
         repo.name
+      end
+
+      protected
+
+      def has_comment_with?(patterns)
+        patterns.any? do |pattern|
+          comments.any? { |s| s.body.include?(pattern) }
+        end
+      end
+
+      def ci(repo)
+        Flow::Workflow::Factory.instance(repo, :continuous_integration)
+      end
+
+      def scm
+        @__client__ ||= Flow::Workflow::Factory.instance(@repo.name, :source_control)
       end
     end
   end

@@ -56,15 +56,15 @@ E
   protected
 
   def ci(repo)
-    Flow::Workflow::Factory.instance(repo, :ci)
+    Flow::Workflow::Factory.instance(repo, :continuous_integration)
   end
 
   def jira(repo = config['projects'].keys.first)
-    @__jira__ ||= Flow::Workflow::Factory.instance(repo, :it)
+    @__jira__ ||= Flow::Workflow::Factory.instance(repo, :issue_tracker)
   end
 
   def notifier(repo = config['projects'].keys.first)
-    @__notifier__ ||= Flow::Workflow::Factory.instance(repo, :not, thor: self)
+    @__notifier__ ||= Flow::Workflow::Factory.instance(repo, :notifier, thor: self)
   end
 
   def config

@@ -1,7 +1,7 @@
 module Flow
   module Workflow
     class Repo
-      attr_accessor :client, :name
+      attr_accessor :scm, :name
 
       def initialize(repo_name)
         @name = repo_name
@@ -21,22 +21,22 @@ module Flow
 
       def issue!(title, body = '', options = {})
         return if issue_exists(title)
-        client.create_issue(@name, title, body, options)
+        scm.create_issue(@name, title, body, options)
       end
 
       protected
 
       def pulls
-        client.pull_requests(@name).map do |pull|
+        scm.pull_requests(@name).map do |pull|
           PullRequest.new(self, pull)
         end
       end
 
       def issues
-        client.issues(@name)
+        scm.issues(@name)
       end
 
-      def client
+      def scm
         @__client__ ||= Flow::Workflow::Factory.instance(@name, :source_control)
       end
     end

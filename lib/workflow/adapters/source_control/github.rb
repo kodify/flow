@@ -48,6 +48,10 @@ module Flow
         client.delete_ref(repo, "heads/#{branch}")
       end
 
+      def comment!(repo, number, body)
+        client.add_comment repo, number, body
+      end
+
       protected
 
       def client

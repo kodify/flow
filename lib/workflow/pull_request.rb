@@ -64,7 +64,7 @@ module Flow
       end
 
       def comment!(body)
-        scm.add_comment(repo.name, @number, body)
+        scm.comment! repo.name, @number, body
       end
 
       def comment_not_green!(extra_message)

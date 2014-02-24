@@ -113,6 +113,7 @@ DEPENDENCIES
   rest-client (~> 1.6.7)
   rspec
   shoulda
+  simplecov
   sinatra
   sinatra-contrib
   sinatra-jsonp

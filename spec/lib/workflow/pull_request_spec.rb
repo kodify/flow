@@ -2,15 +2,25 @@ require 'spec_helper'
 require File.join(base_path, 'lib', 'workflow', 'pull_request')
 
 describe 'PullRequest' do
-  let!(:client)     { double('client') }
+  let!(:scm)     { double('client') }
   let!(:repo)       { double('repo') }
   let!(:pull)       { double('pull', title: title) }
   let!(:keyword)    { '' }
   let!(:title)      { "#{keyword} me" }
 
-  let!(:subject)    { Flow::Workflow::PullRequest.new(repo, pull) }
+  let!(:subject) do
+    Flow::Workflow::PullRequest.new(repo,
+                    id:         '1',
+                    sha:        'sha',
+                    title:      title,
+                    number:     'number',
+                    branch:     'branch',
+                    comments:   [ 'a', 'b' ],
+    )
 
-  describe '#ignore' do
+  end
+
+  describe '#ignore?' do
     let!(:keyword)    { '[IGNORE]' }
     let!(:dictionary) { { 'ignore' => keyword } }
 
@@ -20,20 +30,20 @@ describe 'PullRequest' do
 
     describe 'title contains ignore keyword' do
       it 'should be ignorable' do
-        subject.send(:ignore).should be_true
+        subject.send(:ignore?).should be_true
       end
     end
 
     describe 'title contains ignore keyword' do
       let!(:title) { 'Do not be ignored' }
       it 'should not be ignored' do
-        subject.send(:ignore).should be_false
+        subject.send(:ignore?).should be_false
       end
     end
   end
 
   describe '#all_repos_on_status?' do
-    let!(:jira_id)      { 'WTF-111' }
+    let!(:issue_tracker_id)      { 'WTF-111' }
     let!(:success)      { double('success_pr', status: :success) }
     let!(:uat_ko)       { double('success_pr', status: :uat_ko) }
     let!(:repo1)        { double('repo1') }
@@ -44,7 +54,7 @@ describe 'PullRequest' do
     before do
       repo1.stub(:pull_request_by_name).and_return(pulls_repo1)
       repo2.stub(:pull_request_by_name).and_return(pulls_repo2)
-      subject.stub(:jira_id).and_return(jira_id)
+      subject.stub(:issue_tracker_id).and_return(issue_tracker_id)
     end
     describe 'when repos does not contain any pull request with this id' do
       it 'should be true' do

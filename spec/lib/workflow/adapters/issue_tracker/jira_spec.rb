@@ -1,5 +1,5 @@
 require 'spec_helper'
-require File.join(base_path, 'lib', 'workflow', 'issue_tracker', 'jira')
+require File.join(base_path, 'lib', 'workflow', 'adapters', 'issue_tracker', 'jira')
 
 describe 'Flow::Workflow::Jira' do
 

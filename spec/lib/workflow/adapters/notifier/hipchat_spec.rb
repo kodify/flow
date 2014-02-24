@@ -1,5 +1,5 @@
 require 'spec_helper'
-require File.join(base_path, 'lib', 'workflow', 'notifier', 'hipchat')
+require File.join(base_path, 'lib', 'workflow', 'adapters', 'notifier', 'hipchat')
 
 describe 'Flow::Workflow::Hipchat' do
 

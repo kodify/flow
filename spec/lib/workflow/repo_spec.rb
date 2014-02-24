@@ -5,10 +5,10 @@ require File.join(base_path, 'lib', 'workflow', 'pull_request')
 describe 'Repo' do
   let!(:name)     { 'supu' }
   let!(:subject)  { Flow::Workflow::Repo.new(name) }
-  let!(:client)   { Object.new }
-  let!(:pullA)    { double('pullA', head: { label: 'supu:pullA' } ) }
-  let!(:pullB)    { double('pullB', head: { label: 'supu:pullA' } ) }
-  let!(:pullC)    { double('pullC', head: { label: 'supu:pullA' } ) }
+  let!(:scm)      { Object.new }
+  let!(:pullA)    { double('pullA', head: { label: 'supu:pullA' }, issue_tracker_id: 'PULL-A' ) }
+  let!(:pullB)    { double('pullB', head: { label: 'supu:pullA' }, issue_tracker_id: 'PULL-B' ) }
+  let!(:pullC)    { double('pullC', head: { label: 'supu:pullA' }, issue_tracker_id: 'PULL-C' ) }
   let!(:pulls)    { [pullA, pullB, pullC] }
   let!(:issueA)   { double('issueA', title: 'A') }
   let!(:issueB)   { double('issueB', title: 'B') }
@@ -16,20 +16,9 @@ describe 'Repo' do
   let!(:issues)   { [issueA, issueB, issueC] }
 
   before do
-    client.stub(:pull_requests).with(name).and_return(pulls)
-    client.stub(:issues).and_return(issues)
-    subject.stub(:client).and_return(client)
-  end
-
-  describe '#pull_requests' do
-    it 'should respond with an array' do
-      subject.pull_requests.is_a?(Array).should be_true
-    end
-    it 'should respond with an array of PullRequests' do
-      subject.pull_requests.each do |pr|
-        pr.is_a?(Flow::Workflow::PullRequest).should be_true
-      end
-    end
+    scm.stub(:pull_requests).and_return(pulls)
+    scm.stub(:issues).and_return(issues)
+    subject.stub(:scm).and_return(scm)
   end
 
   describe '#pull_request_by_name' do
@@ -54,7 +43,7 @@ describe 'Repo' do
     describe 'given a valid title' do
       let!(:title) { 'supu_title'}
       before do
-        client.stub(:create_issue).with(name, title, '', {}).and_return(true)
+        scm.stub(:create_issue).with(name, title, '', {}).and_return(true)
       end
       it { subject.issue!(title).should be_true }
     end

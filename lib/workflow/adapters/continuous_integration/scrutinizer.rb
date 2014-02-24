@@ -8,9 +8,9 @@ module Flow
 
       def is_green?(pr)
         @__green__ ||= {}
-        unless @__green__.include? pr.original_branch
-          @__green__[pr.original_branch] = begin
-            build_green?(pr) && scrutinizer_green?(pr)
+        unless @__green__.include? pr.branch
+          @__green__[pr.branch] = begin
+            green?(pr)
           rescue Exception => e
             false
           end
@@ -23,13 +23,7 @@ module Flow
 
       protected
 
-      def build_green?(pr)
-        status = last_travis_status pr
-        return unless status
-        return status.state == 'success'
-      end
-
-      def scrutinizer_green?(pr)
+      def green?(pr)
         metrics             = valid_metrics?(pr)
         status              = last_scrutinizer_github_status(pr)
         scrutinizer_status  = inspection_status(pr)
@@ -46,7 +40,7 @@ module Flow
           comment << "Current scrutinizer status - **#{scrutinizer_status['state']}** \n\n Relaunch it at (#{url}) or die!"
         end
 
-        pr.comment_not_green comment if !comment.empty?
+        pr.comment_not_green! comment if !comment.empty?
 
         metrics && status.state == 'success'
       end
@@ -69,10 +63,6 @@ module Flow
         statuses.any? do |state|
           return state if state.description.include? pattern
         end
-      end
-
-      def last_travis_status(pr)
-        last_status(pr, 'The Travis CI')
       end
 
       def last_scrutinizer_github_status(pr)

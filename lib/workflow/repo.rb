@@ -1,18 +1,18 @@
 module Flow
   module Workflow
     class Repo
-      attr_accessor :client, :name
+      attr_accessor :scm, :name
 
       def initialize(repo_name)
         @name = repo_name
       end
 
       def pull_requests
-        @__pull_requests__ ||= pulls
+        pulls
       end
 
       def pull_request_by_name(name)
-        pulls.find { |pull| pull.jira_id.to_s == name }
+        pulls.find { |pull| pull.issue_tracker_id.to_s == name }
       end
       
       def issue_exists(issue_name)
@@ -21,23 +21,21 @@ module Flow
 
       def issue!(title, body = '', options = {})
         return if issue_exists(title)
-        client.create_issue(@name, title, body, options)
+        scm.create_issue(@name, title, body, options)
       end
 
       protected
 
       def pulls
-        client.pull_requests(@name).map do |pull|
-          PullRequest.new(self, pull)
-        end
+        @__pull_requests__ ||= scm.pull_requests self
       end
 
       def issues
-        client.issues(@name)
+        @__issues__ ||= scm.issues @name
       end
 
-      def client
-        @__client__ ||= Flow::Workflow::Factory.instanceFor(@name, :source_control)
+      def scm
+        @__client__ ||= Flow::Workflow::Factory.instance(@name, :source_control)
       end
     end
   end

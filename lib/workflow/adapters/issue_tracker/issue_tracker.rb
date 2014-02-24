@@ -1,9 +1,12 @@
+require File.join(File.dirname(__FILE__), '..', 'adapter')
+
 module Flow
   module Workflow
-    class IssueTracker
+    class IssueTracker < Flow::Workflow::Adapter
       attr_accessor :min_unassigned_uats, :url
 
       def initialize(config, options = {})
+        super
         @url                  = config['url']
         @user                 = config['user']
         @pass                 = config['pass']

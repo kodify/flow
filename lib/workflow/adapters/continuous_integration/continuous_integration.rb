@@ -1,11 +1,8 @@
+require File.join(File.dirname(__FILE__), '..', 'adapter')
+
 module Flow
   module Workflow
-    class ContinuousIntegration
-      attr_accessor :config
-
-      def initialize(config, options = {})
-        @config = config
-      end
+    class ContinuousIntegration < Flow::Workflow::Adapter
 
       def is_green?(repo, branch, target_url)
         raise 'Method #is_green? not implemented'

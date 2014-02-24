@@ -34,19 +34,19 @@ E
 
   desc 'uat_checker', 'Alert of unassigned uat message'
   def uat_checker
-    issues = jira.issues_by_status('UAT')
+    issues = issue_tracker.issues_by_status('UAT')
     issues_unassigned_on_uat = []
     html_message = ""
 
     issues.each do |issue|
       if issue['fields']['assignee'].nil?
-        url = "#{jira.url}#{issue['key']}"
+        url = "#{issue_tracker.url}#{issue['key']}"
         html_message += "<br /> <a href='#{url}'>#{issue['key']}</a> -  #{issue['fields']['summary']}"
         issues_unassigned_on_uat << issue['fields']['assignee']
       end
     end
 
-    if issues_unassigned_on_uat.length >= jira.min_unassigned_uats
+    if issues_unassigned_on_uat.length >= issue_tracker.min_unassigned_uats
       html_message = "There are #{issues_unassigned_on_uat.length} PR ready to be uated in #{@repo_name} repo: #{html_message}"
       notifier.room = config['projects'].first[1]['not']['uat_room']
       notifier.say html_message, :notify => true, :message_format => 'html'
@@ -56,15 +56,15 @@ E
   protected
 
   def ci(repo)
-    Flow::Workflow::Factory.instanceFor(repo, :ci)
+    Flow::Workflow::Factory.instance(repo, :continuous_integration)
   end
 
-  def jira(repo = config['projects'].keys.first)
-    @__jira__ ||= Flow::Workflow::Factory.instanceFor(repo, :it)
+  def issue_tracker(repo = config['projects'].keys.first)
+    @__it__ ||= Flow::Workflow::Factory.instance(repo, :issue_tracker)
   end
 
   def notifier(repo = config['projects'].keys.first)
-    @__notifier__ ||= Flow::Workflow::Factory.instanceFor(repo, :not, thor: self)
+    @__notifier__ ||= Flow::Workflow::Factory.instance(repo, :notifier, thor: self)
   end
 
   def config

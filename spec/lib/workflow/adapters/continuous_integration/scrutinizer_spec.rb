@@ -1,5 +1,5 @@
 require 'spec_helper'
-require File.join(base_path, 'lib', 'workflow', 'continuous_integration', 'scrutinizer')
+require File.join(base_path, 'lib', 'workflow', 'adapters', 'continuous_integration', 'scrutinizer')
 require File.join(base_path, 'lib', 'workflow', 'pull_request')
 
 describe 'Flow::Workflow:Scrutinizer' do
@@ -31,7 +31,7 @@ describe 'Flow::Workflow:Scrutinizer' do
 
     before do
       pr.stub(:repo_name).and_return(repo)
-      pr.stub(:original_branch).and_return(branch)
+      pr.stub(:branch).and_return(branch)
       pr.stub(:target_url).and_return(target_url)
       pr.stub(:statuses).and_return(statuses)
 

@@ -40,7 +40,7 @@ E
 
     issues.each do |issue|
       if issue['fields']['assignee'].nil?
-        url = "#{issue_tracker.url}#{issue['key']}"
+        url = "#{issue_tracker.url}#{issue['key']}/browse/"
         html_message += "<br /> <a href='#{url}'>#{issue['key']}</a> -  #{issue['fields']['summary']}"
         issues_unassigned_on_uat << issue['fields']['assignee']
       end

@@ -34,7 +34,10 @@ parameters:
       password: github_password
       valid_repos: [ 'kodify/rule34', 'kodify/kumm', 'kodify/katt', 'kodify/CPP' ]
     jenkins:
-      class_name: Jenkins
+      url: http://my_url:18181/job/
+    scrutinizer:
+      url: https://scrutinizer-ci.com/api/repositories/g/
+      token: xxxxx
   projects:
     kodify/repo1:
       continuous_integration:

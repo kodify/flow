@@ -10,10 +10,16 @@ Bored of giving visibility to your work?
 
 Flow automates all workflow related tasks and it integrates with:
 
-- [x] Jira
-- [x] Github
-- [x] Hipchat
-- [x] Jenkins CI
+Issue trackers
+    - [x] Jira
+Source Managers
+    - [x] Github
+- Notifiers
+    - [x] Hipchat
+- Continuous integrations
+    - [x] Scrutinizer
+    - [x] Travis CI
+    - [x] Jenkins CI
 
 It is also flexible and adaptable to all your needs.
 

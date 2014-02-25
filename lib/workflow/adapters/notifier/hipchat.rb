@@ -5,24 +5,29 @@ module Flow
   module Workflow
     class Hipchat < Flow::Workflow::Notifier
 
+      def initialize(config, options = {})
+        super
+        @thor   = options[:thor]
+      end
+
       def say_green_balls
         say 'Hey master has green balls, lets go for a deploy?!', :notify => true
       end
 
       def say_big_build_queued
-        @thor.say 'Big build queued!'
+        say 'Big build queued!'
       end
 
       def say_processing(pr)
-        @thor.say "Processing: #{pr.branch}"
+        say "Processing: #{pr.branch}"
       end
 
       def say_merged(pr)
-        @thor.say "\tMerged (#{pr.number}) and deleted branch #{pr.branch}", 'green'
+        say "\tMerged (#{pr.number}) and deleted branch #{pr.branch}", 'green'
       end
 
       def say_cant_merge(pr)
-        @thor.say "\tCan't merge #{pr.number}, status '#{pr.status.to_s}'"
+        say "\tCan't merge #{pr.number}, status '#{pr.status.to_s}'"
       end
 
       def say_params_not_on_prod
@@ -37,6 +42,7 @@ module Flow
 
       def say(msg, options = {})
         say_on_room(default_user, msg, options)
+        # @thor.say str
       end
 
       def say_on_room(user, message, options = {})

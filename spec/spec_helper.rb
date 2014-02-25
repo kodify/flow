@@ -1,11 +1,25 @@
 require 'rspec'
 require 'rack/test'
+require File.join(File.dirname(__FILE__), '..', 'lib', 'config')
 
 require 'codeclimate-test-reporter'
 CodeClimate::TestReporter.start
 
 def base_path
   @base_path ||= File.join(File.dirname(__FILE__), '..')
+end
+
+def mock_template(adapter, template, replacement = {})
+  path = File.join(File.dirname(__FILE__), 'mock', 'responses', adapter, template)
+  content = open "#{path}.json", &:read
+  replacement.each do |key, value|
+    content.gsub!(key, value)
+  end
+  content
+end
+
+def config
+  Flow::Config.get
 end
 
 RSpec.configure do |c|

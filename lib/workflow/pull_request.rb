@@ -63,15 +63,26 @@ module Flow
         comment! dictionary['uat_ko'][0]
       end
 
+      def move_away!
+        case status
+          when :success # and pr.all_repos_on_status?(valid_repos)
+            integrate!
+          when :not_uat # and pr.all_repos_on_status?(valid_repos, :not_uat)
+            to_uat!
+          else
+            notifier.say_cant_merge self
+        end
+      end
+
       def comment!(body)
         scm.comment! repo.name, @number, body
       end
 
       def comment_not_green!(extra_message)
         message = "Pull request is not OK :disappointed_relieved:"
-        if comments.empty?
+        if @comments.empty?
           comment! "**#{message}** \n #{extra_message}"
-        elsif !comments.last.attrs[:body].include? message
+        elsif !@comments.last.attrs[:body].include? message
           comment! "**#{message}** \n #{extra_message}"
         end
       end
@@ -126,7 +137,7 @@ module Flow
       end
 
       def save_comments_to_be_discussed
-        comments.each do |comment|
+        @comments.each do |comment|
           name = issue_id comment
           repo.issue! "#{name}", "To Discuss : #{comment.body}", labels: 'to_discuss' if comment.body.include? ':exclamation:'
         end
@@ -138,13 +149,23 @@ module Flow
 
       protected
 
+      def integrate!
+        if merge == false
+          notifier.say_cant_merge pull_request
+        else
+          delete_branch
+          to_done!
+          notifier.say_merged pull_request
+        end
+      end
+
       def issue_id(comment)
         "[#{@branch}:#{comment.id}]"
       end
 
       def has_comment_with?(patterns)
         patterns.any? do |pattern|
-          comments.any? { |s| s.body.include?(pattern) }
+          @comments.any? { |s| s.body.include?(pattern) }
         end
       end
 
@@ -160,7 +181,11 @@ module Flow
         Flow::Workflow::Factory.instance(repo.name, :issue_tracker)
       end
 
-      def scm
+    def notifier
+      @__notifier__ ||= Flow::Workflow::Factory.instance(@repo.name, :notifier, thor: @thor)
+    end
+
+    def scm
         @__client__ ||= Flow::Workflow::Factory.instance(@repo.name, :source_control)
       end
     end

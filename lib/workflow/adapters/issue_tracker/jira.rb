@@ -7,6 +7,17 @@ module Flow
   module Workflow
     class Jira < Flow::Workflow::IssueTracker
 
+      def initialize(config, options = {})
+        super
+        @url                  = config['url']
+        @user                 = config['user']
+        @pass                 = config['pass']
+        @min_unassigned_uats  = config['min_unassigned_uats']
+        @status               = { ready_uat:  config['transitions']['ready_uat'],
+                                  uat_nok:    config['transitions']['uat_nok'],
+                                  done:       config['transitions']['done'] }
+      end
+
       def do_move(status_id, issue)
         return :fail unless @status.keys.include?(status_id)
         return :fail unless issue.is_a? String

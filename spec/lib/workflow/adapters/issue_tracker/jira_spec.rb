@@ -88,6 +88,9 @@ describe 'Flow::Workflow::Jira' do
       it 'should return a valid jira issue_id' do
         subject.branch_to_id('xxx:RTF-54').should == 'RTF-54'
       end
+      it 'should return a valid jira issue_id' do
+        subject.branch_to_id('xxx:RTF-54_hola_que_hase').should == 'RTF-54'
+      end
     end
   end
 

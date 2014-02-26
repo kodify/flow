@@ -66,7 +66,6 @@ module Flow
       end
 
       def move_away!
-        require 'debugger'
         case status
           when :success # and pr.all_repos_on_status?(valid_repos)
             integrate!

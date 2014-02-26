@@ -52,7 +52,9 @@ module Flow
       end
 
       def ignore?
-        @title.include? dictionary['ignore']
+        dictionary['ignore'].any? do |pattern|
+          @title.include?(pattern)
+        end
       end
 
       def ship_it!
@@ -146,6 +148,14 @@ module Flow
 
       def repo_name
         repo.name
+      end
+
+      def text_link
+        "https://github.com/#{repo_name}/pull/#{@number} "
+      end
+
+      def html_link
+        "<a href=\"https://github.com/#{repo_name}/pull/#{@number}\">https://github.com/#{repo_name}/pull/#{@number}</a>"
       end
 
       protected

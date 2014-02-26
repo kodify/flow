@@ -35,6 +35,9 @@ module Flow
       def say_on_room(user, message, options = {})
       end
 
+      def say_on_uat_room(user, message, options)
+      end
+
       def working_hours?
       end
 

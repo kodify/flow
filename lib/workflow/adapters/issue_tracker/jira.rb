@@ -1,5 +1,6 @@
 require 'rubygems'
 require 'rest_client'
+require File.join(File.dirname(__FILE__), '..', '..', 'issue')
 
 require File.join(File.dirname(__FILE__), 'issue_tracker')
 
@@ -28,13 +29,22 @@ module Flow
 
       def issues_by_status(status_name)
         url     = "#{@url}/rest/api/latest/search?jql='status'='#{status_name}'"
-        issues  = get_collection(url)
-        return [] if issues.nil? || !issues.include?('issues')
-        issues['issues']
+        get_collection(url)
       end
 
       def branch_to_id(branch)
         branch.match('([a-zA-Z]{2,3})-([0-9]{1,})').to_s
+      end
+
+      def unassigned_issues_by_status(status)
+        issues = issues_by_status(status)
+        issues_unassigned_on_uat = []
+
+        issues.each do |issue|
+          issues_unassigned_on_uat << issue if issue.assignee.nil?
+        end
+
+        issues_unassigned_on_uat
       end
 
       protected
@@ -46,9 +56,24 @@ module Flow
       end
 
       def get_collection(url)
+        response_issues = do_request url
+        return [] if response_issues.nil? || !response_issues.include?('issues')
+
+        issues = []
+        response_issues['issues'].each do |issue|
+          issues << Flow::Workflow::Issue.new(self,
+              key:      issue['key'],
+              summary:  issue['fields']['summary'],
+              assignee: issue['fields']['assignee'],
+          )
+        end
+        issues
+      end
+
+      def do_request(url)
         response = request url
-        response.body.force_encoding('UTF-8')
-        JSON.parse(response.to_str)
+        response.body.force_encoding('UTF-8').to_str
+        JSON.parse(response)
       end
 
       def request(url)

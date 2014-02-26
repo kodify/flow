@@ -22,7 +22,7 @@ describe 'PullRequest' do
 
   describe '#ignore?' do
     let!(:keyword)    { '[IGNORE]' }
-    let!(:dictionary) { { 'ignore' => keyword } }
+    let!(:dictionary) { { 'ignore' => [ keyword ] } }
 
     before do
       subject.stub(:dictionary).and_return(dictionary)

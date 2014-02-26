@@ -10,6 +10,12 @@ module Flow
 
       def issues_by_status(status_name)
       end
+
+      def branch_to_id(branch)
+      end
+
+      def unassigned_issues_by_status(status)
+      end
     end
   end
 end

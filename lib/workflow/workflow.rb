@@ -32,12 +32,14 @@ module Flow
 
       def process_pull_request(pr)
         case pr.status
-          when :success # and pr.all_repos_on_status?(valid_repos)
+          when :success
+            # and pr.all_repos_on_status?(valid_repos)
             pr.save_comments_to_be_discussed
             integrate_pull_request pr
           when :uat_ko
             pr.to_in_progress!
-          when :not_uat # and pr.all_repos_on_status?(valid_repos, :not_uat)
+          when :not_uat
+            # and pr.all_repos_on_status?(valid_repos, :not_uat)
             pr.to_uat!
           when :not_reviewed
             @pr_to_be_reviewed << pr

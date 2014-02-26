@@ -10,6 +10,11 @@ module Flow
         @thor   = options[:thor]
       end
 
+      def say_uat_bottlenecks(count, list)
+        message = "There are #{count} PR ready to be uated: #{list}"
+        say_on_uat_room(default_user, message, options = {})
+      end
+
       def say(msg, options = {})
         say_on_room(default_user, msg, options)
         # @thor.say str
@@ -18,6 +23,12 @@ module Flow
       def say_on_room(user, message, options = {})
         if working_hours?
           client[room].send(user, message, options)
+        end
+      end
+
+      def say_on_uat_room(user, message, options)
+        if working_hours?
+          client[uat_room].send(user, message, options)
         end
       end
 
@@ -46,6 +57,10 @@ module Flow
 
       def room
         @room ||= @config['room']
+      end
+
+      def uat_room
+        @room ||= @config['uat_room']
       end
 
       def client

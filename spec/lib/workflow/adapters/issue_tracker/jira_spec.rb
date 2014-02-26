@@ -52,13 +52,14 @@ describe 'Flow::Workflow::Jira' do
   end
 
   describe '#issues_by_status' do
-    let!(:status_name) { 'status_name' }
+    let!(:status_name)  { 'status_name' }
+    let!(:issue)        { { 'key' => 'a', 'fields' => { 'summary' => 'summary', 'assignee' => 'me' } } }
     before do
       url = "#{config['url']}/rest/api/latest/search?jql='status'='#{status_name}'"
-      subject.stub(:get_collection).with(url).and_return(jira_response)
+      subject.stub(:do_request).with(url).and_return(jira_response)
     end
     describe 'for a valid response' do
-      let!(:jira_response) { { 'issues' => [1, 2, 3] } }
+      let!(:jira_response) { { 'issues' => [issue, issue, issue] } }
       it 'should return an array' do
         issues = subject.issues_by_status(status_name)
         issues.is_a?(Array).should be_true

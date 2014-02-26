@@ -64,6 +64,7 @@ module Flow
       end
 
       def move_away!
+        require 'debugger'
         case status
           when :success # and pr.all_repos_on_status?(valid_repos)
             integrate!
@@ -151,11 +152,11 @@ module Flow
 
       def integrate!
         if merge == false
-          notifier.say_cant_merge pull_request
+          notifier.say_cant_merge self
         else
           delete_branch
           to_done!
-          notifier.say_merged pull_request
+          notifier.say_merged self
         end
       end
 

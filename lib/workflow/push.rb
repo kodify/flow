@@ -20,7 +20,7 @@ module Flow
 
       def status_update(request)
         if scm.request_status_success?(request)
-          pull_request.move_away!
+          pull_request(request).move_away!
         end
       end
 

@@ -35,7 +35,7 @@ module Flow
                           sha:        pull.head.attrs[:sha],
                           title:      pull.title,
                           number:     pull.number,
-                          branch:     pull.head[:label].split(':')[1],
+                          branch:     pull.head.label.split(':')[1],
                           comments:   pull.rels[:comments].get.data,
           )
         end
@@ -81,6 +81,14 @@ module Flow
             pull_request_number:  request['issue']['number'] }
 
         Flow::Workflow::Comment.new properties
+      end
+
+      def pull_request_from_request(request)
+        repo      = Repo.new request['repository']['full_name']
+        sha       = request['branches'].first['commit']['sha']
+        pull_requests(repo).each do |pr|
+          return pr if pr.sha == sha
+        end
       end
 
       def request_status_success?(request)

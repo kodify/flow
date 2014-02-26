@@ -1,5 +1,5 @@
 {
-    "sha": "e635a6a09d31133c7eb8635371d57364c0b2da42",
+    "sha": ":sha:",
     "name": ":repo:",
     "target_url": "https://travis-ci.org/:repo:/builds/19559481",
     "description": "The Travis CI build passed",
@@ -8,13 +8,13 @@
         {
             "name": "readme_update",
             "commit": {
-                "sha": "e635a6a09d31133c7eb8635371d57364c0b2da42",
-                "url": "https://api.github.com/repos/:repo:/commits/e635a6a09d31133c7eb8635371d57364c0b2da42"
+                "sha": ":sha:",
+                "url": "https://api.github.com/repos/:repo:/commits/:sha:"
             }
         }
     ],
     "commit": {
-        "sha": "e635a6a09d31133c7eb8635371d57364c0b2da42",
+        "sha": ":sha:",
         "commit": {
             "author": {
                 "name": "Adria Cidre",
@@ -31,12 +31,12 @@
                 "sha": "cf36a4b1c570c3a53ebd30a5b00e64ea7959e2c4",
                 "url": "https://api.github.com/repos/:repo:/git/trees/cf36a4b1c570c3a53ebd30a5b00e64ea7959e2c4"
             },
-            "url": "https://api.github.com/repos/:repo:/git/commits/e635a6a09d31133c7eb8635371d57364c0b2da42",
+            "url": "https://api.github.com/repos/:repo:/git/commits/:sha:",
             "comment_count": 0
         },
-        "url": "https://api.github.com/repos/:repo:/commits/e635a6a09d31133c7eb8635371d57364c0b2da42",
-        "html_url": "https://github.com/:repo:/commit/e635a6a09d31133c7eb8635371d57364c0b2da42",
-        "comments_url": "https://api.github.com/repos/:repo:/commits/e635a6a09d31133c7eb8635371d57364c0b2da42/comments",
+        "url": "https://api.github.com/repos/:repo:/commits/:sha:",
+        "html_url": "https://github.com/:repo:/commit/:sha:",
+        "comments_url": "https://api.github.com/repos/:repo:/commits/:sha:/comments",
         "author": {
             "login": "adriacidre",
             "id": 593270,

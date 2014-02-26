@@ -31,5 +31,8 @@ if ENV['RAILS_ENV'] == 'test'
   require 'simplecov'
   dir = File.join(base_path, 'build', 'coverage')
   SimpleCov.coverage_dir(dir)
-  SimpleCov.start
+  SimpleCov.start do
+    add_filter '/spec/'
+  end
+
 end

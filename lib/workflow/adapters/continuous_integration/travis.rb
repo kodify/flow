@@ -1,3 +1,5 @@
+require File.join(File.dirname(__FILE__), 'continuous_integration')
+
 module Flow
   module Workflow
     class Travis < Flow::Workflow::ContinuousIntegration

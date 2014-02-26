@@ -18,14 +18,14 @@ module Flow
       end
 
       def pending?(pr)
-        last_scrutinizer_github_status(pr) == 'pending'
+        last_status(pr, 'Scrutinizer') == 'pending'
       end
 
       protected
 
       def green?(pr)
         metrics             = valid_metrics?(pr)
-        status              = last_scrutinizer_github_status(pr)
+        status              = last_status(pr, 'Scrutinizer')
         scrutinizer_status  = inspection_status(pr)
         return unless status
         return unless scrutinizer_status
@@ -60,13 +60,10 @@ module Flow
         statuses = pr.statuses
         return unless statuses
 
-        statuses.any? do |state|
-          return state if state.description.include? pattern
+        statuses.each do |status|
+          return status.state if status.description.include? pattern
         end
-      end
-
-      def last_scrutinizer_github_status(pr)
-        last_status(pr, 'Scrutinizer')
+        nil
       end
 
       def inspection_status(pr)

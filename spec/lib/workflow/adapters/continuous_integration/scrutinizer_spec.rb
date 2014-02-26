@@ -18,29 +18,29 @@ describe 'Flow::Workflow:Scrutinizer' do
   let!(:subject) do
     Flow::Workflow::Scrutinizer.new(config)
   end
+  let!(:repo)                   { nil }
+  let!(:branch)                 { nil }
+  let!(:target_url)             { nil }
+  let!(:inspection_status)      { {} }
+  let!(:metrics)                { }
+  let!(:last_status)            { }
+  let!(:pr)                     { Flow::Workflow::PullRequest }
+  let!(:statuses)               { { } }
+
+  before do
+    pr.stub(:repo_name).and_return(repo)
+    pr.stub(:branch).and_return(branch)
+    pr.stub(:target_url).and_return(target_url)
+    pr.stub(:statuses).and_return(statuses)
+  end
 
   describe '#is_green?' do
-    let!(:repo)                   { nil }
-    let!(:branch)                 { nil }
-    let!(:target_url)             { nil }
-    let!(:inspection_status)      { {} }
-    let!(:metrics)                { }
-    let!(:last_status)            { }
-    let!(:pr)                     { Flow::Workflow::PullRequest }
-    let!(:statuses)               { { } }
-
     before do
-      pr.stub(:repo_name).and_return(repo)
-      pr.stub(:branch).and_return(branch)
-      pr.stub(:target_url).and_return(target_url)
-      pr.stub(:statuses).and_return(statuses)
-
       subject.stub(:inspection_status).and_return(inspection_status)
       subject.stub(:config).and_return(config)
       subject.stub(:metrics).and_return(metrics)
       subject.stub(:last_status).and_return(last_status)
     end
-
     describe 'when an invalid target_url is given' do
       let!(:repo)                   { 'kodify/supu' }
       it { subject.is_green?(pr).should be_false }
@@ -92,4 +92,29 @@ describe 'Flow::Workflow:Scrutinizer' do
       end
     end
   end
+
+  describe '#pending?' do
+    let!(:pending_status) { double('pending_status', description: 'Scrutinizer', state: 'pending') }
+    let!(:failed_status) { double('pending_status', description: 'Scrutinizer', state: 'failed') }
+    let!(:success_status) { double('pending_status', description: 'Scrutinizer', state: 'success') }
+
+    describe 'when no scrutinizer status for this pull request' do
+      let!(:statuses) { [] }
+      it {  subject.pending?(pr).should be_false }
+    end
+    describe 'when no scrutinizer pending status for this pull request' do
+      let!(:statuses) { [success_status, failed_status] }
+      it {  subject.pending?(pr).should be_false }
+    end
+    describe 'when pending status is not the last status' do
+      let!(:statuses) { [failed_status, pending_status] }
+      it { subject.pending?(pr).should be_false }
+    end
+    describe 'when pending status is the last status' do
+      let!(:statuses) { [pending_status, failed_status] }
+      it { subject.pending?(pr).should be_true }
+    end
+  end
+
+
 end

@@ -38,34 +38,30 @@ parameters:
     scrutinizer:
       url: https://scrutinizer-ci.com/api/repositories/g/
       token: xxxxx
+    dummy_notifier:
+      class_name: 'DummyNotifier'
+    dummy_ci:
+      class_name: 'DummyCi'
+    dummy_it:
+      class_name: 'DummyIt'
+    dummy_scm:
+      class_name: 'DummyScm'
   projects:
     kodify/repo1:
       continuous_integration:
-        jenkins:
+        dummy_ci:
       issue_tracker:
-        jira:
+        dummy_it:
       notifier:
-        hipchat:
+        dummy_notifier:
       source_control:
         github:
     kodify/repo2:
       continuous_integration:
-        scrutinizer:
-          metrics:
-            xxxx: 'threshold'
-            yyyy: 'threshold'
+        dummy_ci:
       issue_tracker:
-        jira:
+        dummy_it:
       notifier:
-        hipchat:
-      source_control:
-        github:
-    kodify/repo3:
-      continuous_integration:
-        jenkins:
-      issue_tracker:
-        jira:
-      notifier:
-        hipchat:
+        dummy_notifier:
       source_control:
         github:

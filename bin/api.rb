@@ -8,7 +8,6 @@ path = File.expand_path(File.dirname(__FILE__) + '/..')
 
 require File.join(path, 'lib', 'config')
 require File.join(path, 'lib', 'workflow', 'repo')
-require File.join(path, 'lib', 'workflow', 'workflow')
 require File.join(path, 'lib', 'workflow', 'push')
 
 post '/payload' do

@@ -20,7 +20,6 @@ describe 'The FlowAPI' do
   describe 'issue tracker webhooks' do
     before do
       Flow::Workflow::Repo.any_instance.stub(:pull_request_by_name).and_return(pr)
-      Flow::Workflow::Workflow.any_instance.stub(:source_control).and_return(nil)
     end
 
     describe "/pr/ok" do

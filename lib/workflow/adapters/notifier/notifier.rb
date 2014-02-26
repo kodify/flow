@@ -10,24 +10,23 @@ module Flow
       end
 
       def say_green_balls
+        say 'Hey master has green balls, lets go for a deploy?!', :notify => true
       end
 
       def say_big_build_queued
+        say 'Big build queued!'
       end
 
       def say_processing(pr)
+        say "Processing: #{pr.branch}"
       end
 
       def say_merged(pr)
+        say "\tMerged (#{pr.number}) and deleted branch #{pr.branch}", 'green'
       end
 
       def say_cant_merge(pr)
-      end
-
-      def say_params_not_on_prod
-      end
-
-      def say_deploy_aborted_by_params
+        say "\tCan't merge #{pr.number}, status '#{pr.status.to_s}'"
       end
 
       def say(msg, options = {})

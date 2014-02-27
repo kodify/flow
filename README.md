@@ -1,7 +1,7 @@
 #Flow
 [![Build Status](https://travis-ci.org/kodify/flow.png?branch=master)](https://travis-ci.org/kodify/flow)
 [![Code Climate](https://codeclimate.com/github/kodify/flow.png)](https://codeclimate.com/github/kodify/flow)
-
+ 
 Agile environment workflow assistant
 
 ##Philosophy

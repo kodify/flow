@@ -1,6 +1,6 @@
-require File.join(File.dirname(__FILE__), 'comment')
+require File.join(File.dirname(__FILE__), 'models', 'comment')
 require File.join(File.dirname(__FILE__), 'factory')
-require File.join(File.dirname(__FILE__), 'pull_request')
+require File.join(File.dirname(__FILE__), 'models', 'pull_request')
 
 module Flow
   module Workflow
@@ -32,10 +32,6 @@ module Flow
 
       def scm
         @__scm__ ||= Flow::Workflow::Factory.instance(@repo_name, :source_control)
-      end
-
-      def ci
-        @__ci__ ||= Flow::Workflow::Factory.instance(@repo_name, :continuous_integration)
       end
 
     end

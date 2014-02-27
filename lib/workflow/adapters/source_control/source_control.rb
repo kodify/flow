@@ -26,23 +26,18 @@ module Flow
       end
 
       def delete_branch(repo, branch)
-
       end
 
       def comment!(repo, number, body)
-
       end
 
       def pull_request(repo_name, pull_request_number)
-
       end
 
       def comment_from_request(request)
-
       end
 
       def request_status_success?(request)
-        true
       end
 
     end

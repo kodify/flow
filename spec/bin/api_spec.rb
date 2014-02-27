@@ -3,7 +3,7 @@ ENV['RACK_ENV'] = 'test'
 require 'octokit'
 require 'spec_helper'
 require File.join(base_path, 'bin', 'api')
-require File.join(base_path, 'lib', 'workflow', 'repo')
+require File.join(base_path, 'lib', 'workflow', 'models', 'repo')
 require File.join(base_path, 'lib', 'workflow', 'adapters', 'issue_tracker', 'dummy_it')
 require File.join(base_path, 'lib', 'workflow', 'adapters', 'notifier', 'dummy_notifier')
 require File.join(base_path, 'lib', 'workflow', 'adapters', 'source_control', 'github')
@@ -15,6 +15,12 @@ describe 'The FlowAPI' do
 
   def app
     Sinatra::Application
+  end
+
+  describe '/ping' do
+    it 'should respond to ping' do
+      get(:ping).body.should eq 'its alive'
+    end
   end
 
   describe 'issue tracker webhooks' do

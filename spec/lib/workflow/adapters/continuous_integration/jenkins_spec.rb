@@ -1,6 +1,6 @@
 require 'spec_helper'
 require File.join(base_path, 'lib', 'workflow', 'adapters', 'continuous_integration', 'jenkins')
-require File.join(base_path, 'lib', 'workflow', 'pull_request')
+require File.join(base_path, 'lib', 'workflow', 'models', 'pull_request')
 
 
 describe 'Flow::Workflow::Jenkins' do

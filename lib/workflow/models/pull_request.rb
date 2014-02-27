@@ -1,4 +1,4 @@
-require File.join(File.dirname(__FILE__), 'factory')
+require File.join(File.dirname(__FILE__), '..', 'factory')
 
 module Flow
   module Workflow

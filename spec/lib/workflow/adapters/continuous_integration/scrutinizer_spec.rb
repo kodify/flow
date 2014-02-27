@@ -1,6 +1,6 @@
 require 'spec_helper'
 require File.join(base_path, 'lib', 'workflow', 'adapters', 'continuous_integration', 'scrutinizer')
-require File.join(base_path, 'lib', 'workflow', 'pull_request')
+require File.join(base_path, 'lib', 'workflow', 'models', 'pull_request')
 
 describe 'Flow::Workflow:Scrutinizer' do
   let!(:config) do

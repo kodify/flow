@@ -1,4 +1,4 @@
-require File.join(File.dirname(__FILE__), 'factory')
+require File.join(File.dirname(__FILE__), '..', 'factory')
 
 module Flow
   module Workflow
@@ -32,10 +32,6 @@ module Flow
 
       def code_review_ok?
         dictionary['reviewed'].any? { |word| @body.include?(word) }
-      end
-
-      def code_review_ko?
-        dictionary['blocked'].any? { |word| @body.include?(word) }
       end
 
       def modifies_workflow?

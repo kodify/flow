@@ -95,4 +95,34 @@ describe 'Flow::Workflow::Jira' do
     end
   end
 
+  describe '#unassigned_issues_by_status' do
+    let!(:issues)   { [ issue, issue ] }
+    let!(:issue)    { double('issue', assignee: assignee) }
+    let!(:assignee) { nil }
+
+    before do
+      subject.stub(:issues_by_status).and_return issues
+    end
+
+    describe 'when no issues for the given status' do
+      let!(:issues)   { [] }
+      it 'none issues should be returned' do
+        subject.unassigned_issues_by_status('supu').should eq issues
+      end
+    end
+
+    describe 'when no unassigned issues for the given status' do
+      let!(:assignee) { 'pedro' }
+      it 'none issues should be returned' do
+        subject.unassigned_issues_by_status('supu').should eq []
+      end
+    end
+
+    describe 'when multiple unassigned issues for the given status' do
+      it 'multiple issues should be returned' do
+        subject.unassigned_issues_by_status('supu').should eq issues
+      end
+    end
+  end
+
 end

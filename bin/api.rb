@@ -7,7 +7,7 @@ set :port, 9494
 path = File.expand_path(File.dirname(__FILE__) + '/..')
 
 require File.join(path, 'lib', 'config')
-require File.join(path, 'lib', 'workflow', 'repo')
+require File.join(path, 'lib', 'workflow', 'models', 'repo')
 require File.join(path, 'lib', 'workflow', 'push')
 
 post '/payload' do
@@ -17,9 +17,6 @@ post '/payload' do
     case env['HTTP_X_GITHUB_EVENT']
       when 'issue_comment', 'pull_request_review_comment'
         push.new_comment request
-      when 'create'
-        # TODO Nothing to do at the moment
-        puts 'pull request created'
       when 'status'
         push.status_update request
       else

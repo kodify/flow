@@ -1,8 +1,8 @@
 require 'octokit'
 require File.join(File.dirname(__FILE__), 'source_control')
-require File.join(File.dirname(__FILE__), '..', '..', 'pull_request')
-require File.join(File.dirname(__FILE__), '..', '..', 'comment')
-require File.join(File.dirname(__FILE__), '..', '..', 'repo')
+require File.join(File.dirname(__FILE__), '..', '..', 'models', 'pull_request')
+require File.join(File.dirname(__FILE__), '..', '..', 'models', 'comment')
+require File.join(File.dirname(__FILE__), '..', '..', 'models', 'repo')
 
 module Flow
   module Workflow

@@ -1,4 +1,4 @@
-require File.join(File.dirname(__FILE__), 'repo')
+require File.join(File.dirname(__FILE__), 'models', 'repo')
 require File.join(File.dirname(__FILE__), 'factory')
 require File.join(File.dirname(__FILE__), '..', 'config')
 

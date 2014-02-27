@@ -1,11 +1,11 @@
 require 'spec_helper'
-require File.join(base_path, 'lib', 'workflow', 'repo')
-require File.join(base_path, 'lib', 'workflow', 'pull_request')
+require File.join(base_path, 'lib', 'config')
+require File.join(base_path, 'lib', 'workflow', 'models', 'repo')
+require File.join(base_path, 'lib', 'workflow', 'models', 'pull_request')
 
 describe 'Repo' do
-  let!(:name)     { 'supu' }
+  let!(:name)     { Flow::Config.get['projects'].keys.first }
   let!(:subject)  { Flow::Workflow::Repo.new(name) }
-  let!(:scm)      { Object.new }
   let!(:pullA)    { double('pullA', head: { label: 'supu:pullA' }, issue_tracker_id: 'PULL-A' ) }
   let!(:pullB)    { double('pullB', head: { label: 'supu:pullA' }, issue_tracker_id: 'PULL-B' ) }
   let!(:pullC)    { double('pullC', head: { label: 'supu:pullA' }, issue_tracker_id: 'PULL-C' ) }
@@ -16,9 +16,8 @@ describe 'Repo' do
   let!(:issues)   { [issueA, issueB, issueC] }
 
   before do
-    scm.stub(:pull_requests).and_return(pulls)
-    scm.stub(:issues).and_return(issues)
-    subject.stub(:scm).and_return(scm)
+    Flow::Workflow::Github.any_instance.stub(:pull_requests).and_return(pulls)
+    Flow::Workflow::Github.any_instance.stub(:issues).and_return(issues)
   end
 
   describe '#pull_request_by_name' do
@@ -43,13 +42,27 @@ describe 'Repo' do
     describe 'given a valid title' do
       let!(:title) { 'supu_title'}
       before do
-        scm.stub(:create_issue).with(name, title, '', {}).and_return(true)
+        Flow::Workflow::Github.any_instance.stub(:create_issue).and_return(true)
+      end
+      after do
+        expect_any_instance_of(Flow::Workflow::Github).stub(:create_issue).with(name, title, '', {})
       end
       it { subject.issue!(title).should be_true }
     end
     describe 'given a valid title' do
       it { subject.issue!(issueA.title).should be_nil }
     end
+  end
+
+  describe '#pull_requests' do
+    after do
+      subject.pull_requests
+    end
+
+    it 'should query to source control manager for related pull requests' do
+      expect_any_instance_of(Flow::Workflow::Github).to receive(:pull_requests).with(subject)
+    end
+
   end
 
 end

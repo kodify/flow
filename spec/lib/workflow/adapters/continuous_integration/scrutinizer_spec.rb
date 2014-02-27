@@ -21,9 +21,13 @@ describe 'Flow::Workflow:Scrutinizer' do
   let!(:repo)                   { nil }
   let!(:branch)                 { nil }
   let!(:target_url)             { nil }
-  let!(:inspection_status)      { {} }
-  let!(:metrics)                { }
-  let!(:last_status)            { }
+  let!(:scrutinizer_status)     { { 'state' => 'success'} }
+  let!(:metrics)                { { 'pdepend.cyclomatic_complexity_number' => 10,
+                                    'scrutinizer.quality'                  => 10,
+                                    'scrutinizer.nb_issues'                => 1514 } }
+  let!(:last_status)            { double('last_status', state: state, rels: { target: target }) }
+  let!(:target)                 { double('target', href: 'hello.com') }
+  let!(:state)                  { 'success' }
   let!(:pr)                     { Flow::Workflow::PullRequest }
   let!(:statuses)               { { } }
 
@@ -32,14 +36,17 @@ describe 'Flow::Workflow:Scrutinizer' do
     pr.stub(:branch).and_return(branch)
     pr.stub(:target_url).and_return(target_url)
     pr.stub(:statuses).and_return(statuses)
+    pr.stub(:comment_not_green!).and_return('ok')
+    subject.stub(:inspection_status).and_return 'success'
   end
 
   describe '#is_green?' do
     before do
-      subject.stub(:inspection_status).and_return(inspection_status)
+      subject.stub(:inspection_status).and_return(scrutinizer_status)
       subject.stub(:config).and_return(config)
       subject.stub(:metrics).and_return(metrics)
       subject.stub(:last_status).and_return(last_status)
+      subject.stub(:scrutinizer_url).and_return('url')
     end
     describe 'when an invalid target_url is given' do
       let!(:repo)                   { 'kodify/supu' }
@@ -63,32 +70,47 @@ describe 'Flow::Workflow:Scrutinizer' do
           it { subject.is_green?(pr).should be_false }
         end
         describe 'and failed status' do
-          let!(:inspection_status)      { { 'state' => 'failed'} }
+          let!(:scrutinizer_status)     { { 'state' => 'failed'} }
+          let!(:state)                  { 'failed' }
           it { subject.is_green?(pr).should be_false }
         end
         describe 'and no statuses for this pull request' do
-          let!(:inspection_status)      { { 'state' => 'failed'} }
+          let!(:scrutinizer_status)      { { 'state' => 'failed'} }
           it { subject.is_green?(pr).should be_false }
         end
-        describe 'and expected response' do
-          let!(:inspection_status)      { { 'state' => 'success'} }
-          let!(:last_status)            { Object.new }
-
-          let!(:metrics) do
-            {
-              'pdepend.cyclomatic_complexity_number'  => '120',
-              'scrutinizer.quality'                   => '7',
-              'scrutinizer.nb_issues'                 => '1500',
-            }
-          end
-
+        describe 'and pull request status is success' do
+          let!(:scrutinizer_status)      { { 'state' => 'success'} }
           before do
             last_status.stub(:description).and_return 'The Travis CI'
             last_status.stub(:state).and_return 'success'
           end
-
-          it { subject.is_green?(pr).should be_true }
+          describe "and metrics doesn't accomplish minimums" do
+            let!(:metrics) do
+              {
+                  'pdepend.cyclomatic_complexity_number'  => '999999',
+                  'scrutinizer.quality'                   => '999999',
+                  'scrutinizer.nb_issues'                 => '999999',
+              }
+            end
+            after do
+              subject.is_green?(pr).should be_false
+            end
+            it 'Comment pull request not green' do
+              expect(pr).to receive(:comment_not_green!)
+            end
+          end
+          describe 'and expected response' do
+            let!(:metrics) do
+              {
+                  'pdepend.cyclomatic_complexity_number'  => '120',
+                  'scrutinizer.quality'                   => '7',
+                  'scrutinizer.nb_issues'                 => '1500',
+              }
+            end
+            it { subject.is_green?(pr).should be_true }
+          end
         end
+
       end
     end
   end

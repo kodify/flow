@@ -11,8 +11,6 @@ module Flow
         unless @__green__.include? pr.branch
           @__green__[pr.branch] = begin
             green?(pr)
-          rescue Exception => e
-            false
           end
         end
       end
@@ -26,7 +24,7 @@ module Flow
       def green?(pr)
         metrics             = valid_metrics?(pr)
         status              = last_status(pr, 'Scrutinizer')
-        scrutinizer_status  = inspection_status(pr)
+        scrutinizer_status  = inspection_status(target_url(pr))
         return unless status
         return unless scrutinizer_status
 
@@ -36,7 +34,7 @@ module Flow
         end
 
         if ['failed', 'canceled'].include? scrutinizer_status['state']
-          url = scrutinizer_status['_links']['self']['href'].gsub('/api/repositories/', 'https://scrutinizer-ci.com/')
+          url = scrutinizer_url(scrutinizer_status)
           comment << "Current scrutinizer status - **#{scrutinizer_status['state']}** \n\n Relaunch it at (#{url}) or die!"
         end
 
@@ -46,14 +44,14 @@ module Flow
       end
 
       def target_url(pr)
-        target = last_scrutinizer_github_status(pr)
+        target = last_status(pr, 'Scrutinizer')
         return unless target
 
-        if target.rels[:target].nil?
-          ''
-        else
-          target.rels[:target].href
+        url = ''
+        if !target.rels[:target].nil?
+          url = target.rels[:target].href
         end
+        url
       end
 
       def last_status(pr, pattern)
@@ -67,7 +65,7 @@ module Flow
       end
 
       def inspection_status(pr)
-        return ['state' => 'not_started'] unless url = target_url(pr)
+        return ['state' => 'not_started'] unless url
         repo = pr.repo_name
         @__inspection_status__ ||= JSON.parse(`curl #{inspection_url(inspection_uuid(url), repo)}`)
       end
@@ -85,7 +83,7 @@ module Flow
       end
 
       def valid_metrics?(pr)
-        status = inspection_status(pr)
+        status = inspection_status(target_url(pr))
 
         return if ['failed', 'canceled'].include? status['state']
 
@@ -96,7 +94,7 @@ module Flow
       end
 
       def metrics_report(pr)
-        status = inspection_status(pr)
+        status = inspection_status(target_url(pr))
         return unless status
 
         report = "Metric | Max. Expected | Your Results\r\n";
@@ -106,6 +104,10 @@ module Flow
           report <<  "#{key} | #{metrics_on_repo[key].to_f} | #{metrics(status)[key].to_f}\r\n"
         end
         report << "\n"
+      end
+
+      def scrutinizer_url(scrutinizer_status)
+        scrutinizer_status['_links']['self']['href'].gsub('/api/repositories/', 'https://scrutinizer-ci.com/')
       end
 
       def url

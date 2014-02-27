@@ -9,6 +9,11 @@ module Flow
         super
       end
 
+      def say_uat_bottlenecks(count, list)
+        message = "There are #{count} PR ready to be uated: #{list}"
+        say_on_uat_room(default_user, message, options = {})
+      end
+
       def say_green_balls
         say 'Hey master has green balls, lets go for a deploy?!', :notify => true
       end

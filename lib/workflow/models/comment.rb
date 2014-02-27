@@ -35,7 +35,7 @@ module Flow
       end
 
       def modifies_workflow?
-        uat_ok? || code_review_ok? || pull_request.ignore?
+        uat_ok? || code_review_ok? || pull_request.ignore? || uat_ko?
       end
 
       protected

@@ -170,13 +170,13 @@ describe 'The FlowAPI' do
         describe 'and a previous uat_ko comments on the pull request' do
           let!(:comments) { [ comment_reviewed, comment_uat_ko ] }
           it 'should say unmergeable' do
-            expect_any_instance_of(Flow::Workflow::DummyNotifier).to receive(:say_cant_merge)
+            expect_any_instance_of(Flow::Workflow::DummyNotifier).to receive(:cant_flow)
           end
         end
         describe 'and a previous blocker comment on the pull request' do
           let!(:comments) { [ comment_reviewed, comment_uat_ko ] }
           it 'should say unmergeable' do
-            expect_any_instance_of(Flow::Workflow::DummyNotifier).to receive(:say_cant_merge)
+            expect_any_instance_of(Flow::Workflow::DummyNotifier).to receive(:cant_flow)
           end
         end
       end
@@ -271,7 +271,7 @@ describe 'The FlowAPI' do
             expect_any_instance_of(Flow::Workflow::DummyNotifier).to_not receive(:say_merged)
           end
           it "should notify branch can't be merged" do
-            expect_any_instance_of(Flow::Workflow::DummyNotifier).to receive(:say_cant_merge)
+            expect_any_instance_of(Flow::Workflow::DummyNotifier).to receive(:say_merge_failed)
           end
         end
 

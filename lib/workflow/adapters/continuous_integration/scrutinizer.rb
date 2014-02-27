@@ -13,6 +13,7 @@ module Flow
             green?(pr)
           end
         end
+        @__green__[pr.branch]
       end
 
       def pending?(pr)

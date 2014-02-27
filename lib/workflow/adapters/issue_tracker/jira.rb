@@ -1,6 +1,7 @@
 require 'rubygems'
 require 'rest_client'
 require File.join(File.dirname(__FILE__), '..', '..', 'models', 'issue')
+require File.join(File.dirname(__FILE__), '..', '..', 'factory')
 
 require File.join(File.dirname(__FILE__), 'issue_tracker')
 

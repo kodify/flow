@@ -58,7 +58,7 @@ module Flow
       end
 
       def ship_it!
-        comment! dictionary['uat_ok'][0]
+        integrate!
       end
 
       def boom_it!
@@ -72,7 +72,9 @@ module Flow
           when :not_uat # and pr.all_repos_on_status?(valid_repos, :not_uat)
             to_uat!
           else
-            notifier.say_cant_merge self
+            if issue_tracker_id
+              notifier.cant_flow issue_tracker_id, status
+            end
         end
       end
 
@@ -91,18 +93,21 @@ module Flow
 
       def to_uat!
         if issue_tracker_id
+          notifier.say_moved issue_tracker_id, 'ready_uat'
           issue_tracker.do_move :ready_uat, issue_tracker_id
         end
       end
 
       def to_in_progress!
         if issue_tracker_id
+          notifier.say_moved issue_tracker_id, 'uat_nok'
           issue_tracker.do_move :uat_nok, issue_tracker_id
         end
       end
 
       def to_done!
         if issue_tracker_id
+          notifier.say_moved issue_tracker_id, 'done'
           issue_tracker.do_move :done, issue_tracker_id
         end
       end
@@ -135,7 +140,7 @@ module Flow
       end
 
       def issue_tracker_id
-        issue_tracker.branch_to_id
+        issue_tracker.branch_to_id(branch)
       end
 
       def save_comments_to_be_discussed
@@ -161,11 +166,13 @@ module Flow
 
       def integrate!
         if merge == false
-          notifier.say_cant_merge self
+          if issue_tracker_id
+            notifier.say_merge_failed issue_tracker_id
+          end
         else
           delete_branch
           to_done!
-          notifier.say_merged self
+          notifier.say_merged issue_tracker_id, branch
         end
       end
 

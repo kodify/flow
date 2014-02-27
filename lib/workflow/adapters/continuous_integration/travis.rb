@@ -8,6 +8,7 @@ module Flow
         unless @__green__.include? pr.branch
           @__green__[pr.branch] = build_status? pr, 'success'
         end
+        @__green__[pr.branch]
       end
 
       def pending?(pr)
@@ -15,6 +16,7 @@ module Flow
         unless @__pending__.include? pr.branch
           @__pending__[pr.branch] = build_status? pr, 'pending'
         end
+        @__pending__[pr.branch]
       end
 
       protected

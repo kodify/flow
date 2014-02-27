@@ -18,16 +18,28 @@ module Flow
         say 'Hey master has green balls, lets go for a deploy?!', :notify => true
       end
 
+      def say_moved(issue, status)
+        say "Issue #{issue} moved to status #{status}", :notify => true
+      end
+
+      def cant_flow(issue, status)
+        say "Issue #{issue} can't flow, status #{status}", :notify => true, :color => 'red'
+      end
+
+      def say_merge_failed(issue)
+        say "Issue #{issue} can't be merged, please rebase it", :notify => true, :color => 'red'
+      end
+
+      def say_merged(issue, branch)
+        say "\tMerged issue (#{issue}) and deleted related branch #{branch}", :notify => true, :color => 'green'
+      end
+
       def say_big_build_queued
         say 'Big build queued!'
       end
 
       def say_processing(pr)
         say "Processing: #{pr.branch}"
-      end
-
-      def say_merged(pr)
-        say "\tMerged (#{pr.number}) and deleted branch #{pr.branch}", 'green'
       end
 
       def say_cant_merge(pr)

@@ -30,14 +30,7 @@ module Flow
 
       def pull_requests(repo)
         client.pull_requests(repo.name).map do |pull|
-          PullRequest.new(repo,
-                          id:         pull.id,
-                          sha:        pull.head.attrs[:sha],
-                          title:      pull.title,
-                          number:     pull.number,
-                          branch:     pull.head.label.split(':')[1],
-                          comments:   pull.rels[:comments].get.data,
-          )
+          new_pull_request repo, pull
         end
       end
 
@@ -57,30 +50,20 @@ module Flow
       def pull_request(repo_name, pull_request_number)
         repo = Repo.new repo_name
         pull = client.pull_request repo_name, pull_request_number
-        Flow::Workflow::PullRequest.new(repo,
-                                        id:         pull.id,
-                                        sha:        pull.head.attrs[:sha],
-                                        title:      pull.title,
-                                        number:     pull.number,
-                                        branch:     pull.head.label.split(':')[1],
-                                        comments:   pull.rels[:comments].get.data,
-        )
+        new_pull_request(repo, pull)
       end
 
       def comment_from_request(request)
-        properties = {
-            id:                   request['comment']['id'],
-            url:                  request['comment']['url'],
-            html_url:             request['comment']['html_url'],
-            user_name:            request['comment']['user']['login'],
-            created_at:           request['comment']['created_at'],
-            updated_at:           request['comment']['updated_at'],
-            body:                 request['comment']['body'],
-            repo_name:            request['repository']['full_name'],
-            issue_url:            request['comment']['issue_url'],
-            pull_request_number:  request['issue']['number'] }
-
-        Flow::Workflow::Comment.new properties
+        Flow::Workflow::Comment.new({ id:                   request['comment']['id'],
+                                      url:                  request['comment']['url'],
+                                      html_url:             request['comment']['html_url'],
+                                      user_name:            request['comment']['user']['login'],
+                                      created_at:           request['comment']['created_at'],
+                                      updated_at:           request['comment']['updated_at'],
+                                      body:                 request['comment']['body'],
+                                      repo_name:            request['repository']['full_name'],
+                                      issue_url:            request['comment']['issue_url'],
+                                      pull_request_number:  request['issue']['number'] })
       end
 
       def pull_request_from_request(request)
@@ -105,6 +88,18 @@ module Flow
           )
         end
       end
+
+      def new_pull_request(repo, pull)
+        Flow::Workflow::PullRequest.new(repo,
+                                        id:         pull.id,
+                                        sha:        pull.head.attrs[:sha],
+                                        title:      pull.title,
+                                        number:     pull.number,
+                                        branch:     pull.head.label.split(':')[1],
+                                        comments:   pull.rels[:comments].get.data,
+        )
+      end
+
     end
   end
 end

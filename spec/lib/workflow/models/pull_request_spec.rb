@@ -1,5 +1,5 @@
 require 'spec_helper'
-require File.join(base_path, 'lib', 'workflow', 'pull_request')
+require File.join(base_path, 'lib', 'workflow', 'models', 'pull_request')
 
 describe 'PullRequest' do
   let!(:scm)     { double('client') }
@@ -22,7 +22,7 @@ describe 'PullRequest' do
 
   describe '#ignore?' do
     let!(:keyword)    { '[IGNORE]' }
-    let!(:dictionary) { { 'ignore' => keyword } }
+    let!(:dictionary) { { 'ignore' => [ keyword ] } }
 
     before do
       subject.stub(:dictionary).and_return(dictionary)

@@ -1,9 +1,13 @@
 require File.join(File.dirname(__FILE__), 'continuous_integration', 'jenkins')
 require File.join(File.dirname(__FILE__), 'continuous_integration', 'scrutinizer')
 require File.join(File.dirname(__FILE__), 'continuous_integration', 'travis')
+require File.join(File.dirname(__FILE__), 'continuous_integration', 'dummy_ci')
 require File.join(File.dirname(__FILE__), 'issue_tracker', 'jira')
+require File.join(File.dirname(__FILE__), 'issue_tracker', 'dummy_it')
 require File.join(File.dirname(__FILE__), 'notifier', 'hipchat')
+require File.join(File.dirname(__FILE__), 'notifier', 'dummy_notifier')
 require File.join(File.dirname(__FILE__), 'source_control', 'github')
+require File.join(File.dirname(__FILE__), 'source_control', 'dummy_scm')
 
 module Flow
   module Workflow

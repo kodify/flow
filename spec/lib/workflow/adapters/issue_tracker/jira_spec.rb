@@ -52,13 +52,14 @@ describe 'Flow::Workflow::Jira' do
   end
 
   describe '#issues_by_status' do
-    let!(:status_name) { 'status_name' }
+    let!(:status_name)  { 'status_name' }
+    let!(:issue)        { { 'key' => 'a', 'fields' => { 'summary' => 'summary', 'assignee' => 'me' } } }
     before do
       url = "#{config['url']}/rest/api/latest/search?jql='status'='#{status_name}'"
-      subject.stub(:get_collection).with(url).and_return(jira_response)
+      subject.stub(:do_request).with(url).and_return(jira_response)
     end
     describe 'for a valid response' do
-      let!(:jira_response) { { 'issues' => [1, 2, 3] } }
+      let!(:jira_response) { { 'issues' => [issue, issue, issue] } }
       it 'should return an array' do
         issues = subject.issues_by_status(status_name)
         issues.is_a?(Array).should be_true
@@ -79,6 +80,47 @@ describe 'Flow::Workflow::Jira' do
         issues = subject.issues_by_status(status_name)
         issues.is_a?(Array).should be_true
         issues.length.should be 0
+      end
+    end
+  end
+
+  describe '#branch_to_id' do
+    describe 'for a valid jira issue id' do
+      it 'should return a valid jira issue_id' do
+        subject.branch_to_id('xxx:RTF-54').should == 'RTF-54'
+      end
+      it 'should return a valid jira issue_id' do
+        subject.branch_to_id('xxx:RTF-54_hola_que_hase').should == 'RTF-54'
+      end
+    end
+  end
+
+  describe '#unassigned_issues_by_status' do
+    let!(:issues)   { [ issue, issue ] }
+    let!(:issue)    { double('issue', assignee: assignee) }
+    let!(:assignee) { nil }
+
+    before do
+      subject.stub(:issues_by_status).and_return issues
+    end
+
+    describe 'when no issues for the given status' do
+      let!(:issues)   { [] }
+      it 'none issues should be returned' do
+        subject.unassigned_issues_by_status('supu').should eq issues
+      end
+    end
+
+    describe 'when no unassigned issues for the given status' do
+      let!(:assignee) { 'pedro' }
+      it 'none issues should be returned' do
+        subject.unassigned_issues_by_status('supu').should eq []
+      end
+    end
+
+    describe 'when multiple unassigned issues for the given status' do
+      it 'multiple issues should be returned' do
+        subject.unassigned_issues_by_status('supu').should eq issues
       end
     end
   end

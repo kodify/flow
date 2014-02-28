@@ -5,34 +5,8 @@ module Flow
   module Workflow
     class Hipchat < Flow::Workflow::Notifier
 
-      def say_green_balls
-        say 'Hey master has green balls, lets go for a deploy?!', :notify => true
-      end
-
-      def say_big_build_queued
-        @thor.say 'Big build queued!'
-      end
-
-      def say_processing(pr)
-        @thor.say "Processing: #{pr.branch}"
-      end
-
-      def say_merged(pr)
-        @thor.say "\tMerged (#{pr.number}) and deleted branch #{pr.branch}", 'green'
-      end
-
-      def say_cant_merge(pr)
-        @thor.say "\tCan't merge #{pr.number}, status '#{pr.status.to_s}'"
-      end
-
-      def say_params_not_on_prod
-        msg = "All those params doesn't seem to be in prod environment"
-        say(msg, :notify => true)
-      end
-
-      def say_deploy_aborted_by_params
-        msg = 'DEPLOY ABORTED! Apply changes to parameters.yml'
-        say(msg, :notify => true)
+      def initialize(config, options = {})
+        super
       end
 
       def say(msg, options = {})
@@ -41,7 +15,13 @@ module Flow
 
       def say_on_room(user, message, options = {})
         if working_hours?
-          client[room].send(user, message, options)
+          client[main_room].send(user, message, options)
+        end
+      end
+
+      def say_on_uat_room(user, message, options)
+        if working_hours?
+          client[uat_room].send(user, message, options)
         end
       end
 
@@ -68,21 +48,22 @@ module Flow
         @config['default_user']
       end
 
-      def room
-        @room ||= @config['room']
+      def main_room
+        @config['rooms']['main']
+      end
+
+      def uat_room
+        @config['rooms']['uat']
+      end
+
+      def logs_room
+        @config['rooms']['logs']
       end
 
       def client
         HipChat::Client.new(@config['token'])
       end
 
-      def random_user
-        [ 'Rocco Siffredi', 'Jenna haze', 'Bridget The Midget', 'Eve Angel', 'Eva Angelina',
-          'Alexis Texas', 'Jayden James', ' Lexi Belle', 'Phoenix Marie', 'Lisa Ann', 'Honeysuckle',
-          'Morning Glory', 'Peach Blossom', 'Beachcomber', 'Tiddly Wink', 'Tra La La',
-          'Rarity', 'Pinkie Pie', 'Rainbox Dash', 'Fluttershy'
-        ].sample
-      end
     end
   end
 end

@@ -4,8 +4,8 @@ module Flow
   module Workflow
     class ContinuousIntegration < Flow::Workflow::Adapter
 
-      def is_green?(repo, branch, target_url)
-        raise 'Method #is_green? not implemented'
+      def is_green?(pull_request)
+        true
       end
 
       def pending?(pr)

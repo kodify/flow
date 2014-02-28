@@ -1,5 +1,5 @@
 require 'spec_helper'
-require File.join(base_path, 'lib', 'workflow', 'adapters', 'continuous_integration', 'scrutinizer_new')
+require File.join(base_path, 'lib', 'workflow', 'adapters', 'continuous_integration', 'scrutinizer')
 
 describe 'Flow::Workflow::ScritinizerNew' do
   let!(:pull_request)   { double('pull_request', statuses: statuses, repo_name: 'my/repo', comment_not_green!: true) }

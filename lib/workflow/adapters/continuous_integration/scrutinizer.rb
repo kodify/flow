@@ -4,119 +4,95 @@ require File.join(File.dirname(__FILE__), 'continuous_integration')
 
 module Flow
   module Workflow
-    class Scrutinizer < Flow::Workflow::ContinuousIntegration
+    class ScrutinizerNew < Flow::Workflow::ContinuousIntegration
 
       def is_green?(pr)
-        @__green__ ||= {}
-        unless @__green__.include? pr.branch
-          @__green__[pr.branch] = begin
-            green?(pr)
-          end
-        end
-        @__green__[pr.branch]
+        @pr = pr
+        return false unless success_status?
+        return valid_metrics?
       end
 
       def pending?(pr)
-        last_status(pr, 'Scrutinizer') == 'pending'
+        @pr = pr
+        pending_status?
       end
 
       protected
 
-      def green?(pr)
-        metrics             = valid_metrics?(pr)
-        status              = last_status(pr, 'Scrutinizer')
-        scrutinizer_status  = inspection_status(target_url(pr))
-        return unless status
-        return unless scrutinizer_status
-
-        comment = ''
-        if !metrics && status.state == 'success'
-          comment << "\n Metrics doesn't accomplish the configuration : \n\n #{metrics_report(pr)}"
-        end
-
-        if ['failed', 'canceled'].include? scrutinizer_status['state']
-          url = scrutinizer_url(scrutinizer_status)
-          comment << "Current scrutinizer status - **#{scrutinizer_status['state']}** \n\n Relaunch it at (#{url}) or die!"
-        end
-
-        pr.comment_not_green! comment if !comment.empty?
-
-        metrics && status.state == 'success'
+      def pending_status?
+        current_scrutinizer_state == 'pending'
       end
 
-      def target_url(pr)
-        target = last_status(pr, 'Scrutinizer')
-        return unless target
-
-        url = ''
-        if !target.rels[:target].nil?
-          url = target.rels[:target].href
-        end
-        url
+      def success_status?
+        current_scrutinizer_state == 'success'
       end
 
-      def last_status(pr, pattern)
-        statuses = pr.statuses
-        return unless statuses
-
-        statuses.each do |status|
-          return status.state if status.description.include? pattern
-        end
-        nil
+      def current_scrutinizer_state
+        current_scrutinizer_status.state if current_scrutinizer_status.respond_to? 'state'
       end
 
-      def inspection_status(pr)
-        return ['state' => 'not_started'] unless url
-        repo = pr.repo_name
-        @__inspection_status__ ||= JSON.parse(`curl #{inspection_url(inspection_uuid(url), repo)}`)
-      end
-
-      def inspection_uuid(target_url)
-        target_url.slice(target_url.index('inspections'), target_url.size).sub('inspections/', '')
-      end
-
-      def inspection_url(uuid, repo)
-        "#{url}#{repo}/inspections/#{uuid}?access_token=#{token}"
-      end
-
-      def metrics(status)
-        status['_embedded']['repository']['applications']['master']['index']['_embedded']['project']['metric_values']
-      end
-
-      def valid_metrics?(pr)
-        status = inspection_status(target_url(pr))
-
-        return if ['failed', 'canceled'].include? status['state']
-
-        metrics_on_repo = config['metrics']
-        metrics_on_repo.keys.all? do |key|
-          metrics(status)[key].to_f <= metrics_on_repo[key].to_f
+      def current_scrutinizer_status
+        @pr.statuses.each do |status|
+          return status if status.description.include? 'Scrutinizer'
         end
       end
 
-      def metrics_report(pr)
-        status = inspection_status(target_url(pr))
-        return unless status
-
-        report = "Metric | Max. Expected | Your Results\r\n";
-        report << "--- | --- | ---\r\n";
-        metrics_on_repo = config['metrics']
-        metrics_on_repo.keys.each do |key|
-          report <<  "#{key} | #{metrics_on_repo[key].to_f} | #{metrics(status)[key].to_f}\r\n"
+      def valid_metrics?
+        status = request_build_info['state']
+        if ['failed', 'canceled'].include? status
+          @pr.comment_not_green! "Pull request marked as #{status} by Scrutinizer"
+          return false
+        elsif invalid_metrics.empty?
+          return true
+        else
+          send_metrics_report
+          return false
         end
-        report << "\n"
       end
 
-      def scrutinizer_url(scrutinizer_status)
-        scrutinizer_status['_links']['self']['href'].gsub('/api/repositories/', 'https://scrutinizer-ci.com/')
+      def invalid_metrics
+        invalid = {}
+        config['metrics'].keys.each do |type|
+          if build_metrics[type].to_f <= config['metrics'][type].to_f
+            invalid[type] = { expected: config['metrics'][type].to_f, reported: build_metrics[type].to_f }
+          end
+        end
+        invalid
       end
 
-      def url
-        config['url']
+      def build_metrics
+        request_build_info['_embedded']['repository']['applications']['master']['index']['_embedded']['project']['metric_values']
       end
 
-      def token
-        config['token']
+      def request_build_info
+        @__inspection_status__ ||= begin
+          url   = current_scrutinizer_status.rels[:target].href
+          uuid  = url.slice(url.index('inspections'), url.size).sub('inspections/', '')
+
+          url = "#{config['url']}#{@pr.repo_name}/inspections/#{uuid}?access_token=#{config['token']}"
+
+          JSON.parse(curl(url))
+        end
+      end
+
+      def send_metrics_report
+        unless invalid_metrics.empty?
+          report = "Metric | Max. Expected | Your Results\r\n";
+          report << "--- | --- | ---\r\n";
+          invalid_metrics.each do |key, value|
+            report <<  "#{key} | #{value[:expected]} | #{value[:reported]}\r\n"
+          end
+          report << "\n"
+        end
+        @pr.comment_not_green! report if !report.empty?
+      end
+
+      def build_metric(type)
+        request_build_info['_embedded']['repository']['applications']['master']['index']['_embedded']['project']['metric_values'][type]
+      end
+
+      def curl(url)
+        `curl #{url}`
       end
     end
   end

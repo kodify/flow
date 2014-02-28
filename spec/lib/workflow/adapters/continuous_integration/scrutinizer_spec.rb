@@ -1,142 +1,90 @@
 require 'spec_helper'
-require File.join(base_path, 'lib', 'workflow', 'adapters', 'continuous_integration', 'scrutinizer')
-require File.join(base_path, 'lib', 'workflow', 'models', 'pull_request')
+require File.join(base_path, 'lib', 'workflow', 'adapters', 'continuous_integration', 'scrutinizer_new')
 
-describe 'Flow::Workflow:Scrutinizer' do
-  let!(:config) do
-    {
-      'url'   => 'url',
-      'token' => 'token',
-      'metrics' => {
-          'pdepend.cyclomatic_complexity_number'  => '127',
-          'scrutinizer.quality'                   => '7,6',
-          'scrutinizer.nb_issues'                 => '1514',
+describe 'Flow::Workflow::ScritinizerNew' do
+  let!(:pull_request)   { double('pull_request', statuses: statuses, repo_name: 'my/repo', comment_not_green!: true) }
+  let!(:statuses)       { [] }
+  let!(:pending)        { double('pending', state: 'pending', description: 'Scrutinizer pending') }
+  let!(:success)        { double('success', state: 'success', description: 'Scrutinizer success', rels: rels) }
+  let!(:failed)         { double('failed', state: 'failed', description: 'Scrutinizer failed') }
+  let!(:success_travis) { double('failed', state: 'success', description: 'Travis') }
+  let!(:config)         { { 'url' => 's', 'token' => 'token', 'metrics' => metrics } }
+  let!(:metrics)        { { 'pdepend.cyclomatic_complexity_number' => complexity, 'scrutinizer.nb_issues' => issues_number} }
+  let!(:issues_number)  { 2 }
+  let!(:complexity)     { 2 }
+  let!(:rels)           { { target: target} }
+  let!(:target)         { double('target', href: 'https://scrutinizer-ci.com/g/owner/repo/inspections/inspectionId' )}
+  let!(:subject)        { Flow::Workflow::ScrutinizerNew.new(config) }
 
-      }
-    }
-  end
-  let!(:subject) do
-    Flow::Workflow::Scrutinizer.new(config)
-  end
-  let!(:repo)                   { nil }
-  let!(:branch)                 { nil }
-  let!(:target_url)             { nil }
-  let!(:scrutinizer_status)     { { 'state' => 'success'} }
-  let!(:metrics)                { { 'pdepend.cyclomatic_complexity_number' => 10,
-                                    'scrutinizer.quality'                  => 10,
-                                    'scrutinizer.nb_issues'                => 1514 } }
-  let!(:last_status)            { double('last_status', state: state, rels: { target: target }) }
-  let!(:target)                 { double('target', href: 'hello.com') }
-  let!(:state)                  { 'success' }
-  let!(:pr)                     { Flow::Workflow::PullRequest }
-  let!(:statuses)               { { } }
-
-  before do
-    pr.stub(:repo_name).and_return(repo)
-    pr.stub(:branch).and_return(branch)
-    pr.stub(:target_url).and_return(target_url)
-    pr.stub(:statuses).and_return(statuses)
-    pr.stub(:comment_not_green!).and_return('ok')
-    subject.stub(:inspection_status).and_return 'success'
-  end
 
   describe '#is_green?' do
-    before do
-      subject.stub(:inspection_status).and_return(scrutinizer_status)
-      subject.stub(:config).and_return(config)
-      subject.stub(:metrics).and_return(metrics)
-      subject.stub(:last_status).and_return(last_status)
-      subject.stub(:scrutinizer_url).and_return('url')
-    end
-    describe 'when an invalid target_url is given' do
-      let!(:repo)                   { 'kodify/supu' }
-      it { subject.is_green?(pr).should be_false }
-    end
-
-    describe 'when an invalid repo is given' do
-      let!(:target_url)             { 'http://www.supu.com' }
-      it { subject.is_green?(pr).should be_false }
-    end
-
-    describe 'for a valid input data' do
-      let!(:repo)                   { 'kodify/supu' }
-      let!(:branch)                 { nil }
-      let!(:target_url)             { 'http://www.supu.com' }
-      describe 'for an invalid scrutinizer response' do
-        it { subject.is_green?(pr).should be_false }
+    describe 'for a pull request with success status' do
+      let!(:build_json) do
+        mock_template('scrutinizer', 'build', ':uuid:'    => uuid,
+                      ':status:'  => status)
       end
-      describe 'and a valid scrutinizer response' do
-        describe 'and unexpected response' do
-          it { subject.is_green?(pr).should be_false }
-        end
-        describe 'and failed status' do
-          let!(:scrutinizer_status)     { { 'state' => 'failed'} }
-          let!(:state)                  { 'failed' }
-          it { subject.is_green?(pr).should be_false }
-        end
-        describe 'and no statuses for this pull request' do
-          let!(:scrutinizer_status)      { { 'state' => 'failed'} }
-          it { subject.is_green?(pr).should be_false }
-        end
-        describe 'and pull request status is success' do
-          let!(:scrutinizer_status)      { { 'state' => 'success'} }
-          before do
-            last_status.stub(:description).and_return 'The Travis CI'
-            last_status.stub(:state).and_return 'success'
-          end
-          describe "and metrics doesn't accomplish minimums" do
-            let!(:metrics) do
-              {
-                  'pdepend.cyclomatic_complexity_number'  => '999999',
-                  'scrutinizer.quality'                   => '999999',
-                  'scrutinizer.nb_issues'                 => '999999',
-              }
-            end
-            after do
-              subject.is_green?(pr).should be_false
-            end
-            it 'Comment pull request not green' do
-              expect(pr).to receive(:comment_not_green!)
-            end
-          end
-          describe 'and expected response' do
-            let!(:metrics) do
-              {
-                  'pdepend.cyclomatic_complexity_number'  => '120',
-                  'scrutinizer.quality'                   => '7',
-                  'scrutinizer.nb_issues'                 => '1500',
-              }
-            end
-            it { subject.is_green?(pr).should be_true }
-          end
-        end
+      let!(:uuid)   { 'uuid' }
+      let!(:statuses) { [success] }
 
+      before do
+        subject.stub(:curl).and_return(build_json)
       end
+
+      describe 'and scrutinizer build status as success' do
+        let!(:status) { 'success' }
+        describe 'and valid metrics' do
+          let!(:issues_number)  { 0 }
+          let!(:complexity)     { 0 }
+          it { subject.is_green?(pull_request).should be_true }
+        end
+        describe 'and not valid metrics' do
+          let!(:issues_number)  { 999999 }
+          let!(:complexity)     { 999999 }
+          it { subject.is_green?(pull_request).should be_false }
+          it 'should make a comment on the pull request as not green' do
+            expect(pull_request).to receive(:comment_not_green!)
+            subject.is_green?(pull_request)
+          end
+        end
+      end
+
+      describe 'and scrutinizer build status as failed' do
+        let!(:status) { 'failed' }
+        it { subject.is_green?(pull_request).should be_false }
+        it 'should make a comment on the pull request as not green' do
+          expect(pull_request).to receive(:comment_not_green!).with("Pull request marked as #{status} by Scrutinizer")
+          subject.is_green?(pull_request)
+        end
+      end
+
+      describe 'and scrutinizer build status as canceled' do
+        let!(:status) { 'canceled' }
+        it { subject.is_green?(pull_request).should be_false }
+        it 'should make a comment on the pull request as not green' do
+          expect(pull_request).to receive(:comment_not_green!).with("Pull request marked as #{status} by Scrutinizer")
+          subject.is_green?(pull_request)
+        end
+      end
+    end
+
+    describe 'for a pull request with non success status' do
+      let!(:statuses) { [success_travis] }
+      it { subject.is_green?(pull_request).should be_false }
     end
   end
 
-  describe '#pending?' do
-    let!(:pending_status) { double('pending_status', description: 'Scrutinizer', state: 'pending') }
-    let!(:failed_status) { double('pending_status', description: 'Scrutinizer', state: 'failed') }
-    let!(:success_status) { double('pending_status', description: 'Scrutinizer', state: 'success') }
-
-    describe 'when no scrutinizer status for this pull request' do
-      let!(:statuses) { [] }
-      it {  subject.pending?(pr).should be_false }
+  describe '#is_pending?' do
+    describe 'for a pull request without Scrutinizer status' do
+      let!(:statuses) { [success_travis] }
+      it { subject.pending?(pull_request).should be_false }
     end
-    describe 'when no scrutinizer pending status for this pull request' do
-      let!(:statuses) { [success_status, failed_status] }
-      it {  subject.pending?(pr).should be_false }
+    describe 'for a pull request with last non pending status' do
+      let!(:statuses) { [success, success_travis, pending] }
+      it { subject.pending?(pull_request).should be_false }
     end
-    describe 'when pending status is not the last status' do
-      let!(:statuses) { [failed_status, pending_status] }
-      it { subject.pending?(pr).should be_false }
-    end
-    describe 'when pending status is the last status' do
-      let!(:statuses) { [pending_status, failed_status] }
-      it { subject.pending?(pr).should be_true }
+    describe 'for a pull request with last pending status' do
+      let!(:statuses) { [pending, success_travis] }
+      it { subject.pending?(pull_request).should be_true }
     end
   end
-
-
 end

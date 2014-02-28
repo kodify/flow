@@ -7,17 +7,15 @@ module Flow
 
       def initialize(config, options = {})
         super
-        @thor   = options[:thor]
       end
 
       def say(msg, options = {})
         say_on_room(default_user, msg, options)
-        # @thor.say str
       end
 
       def say_on_room(user, message, options = {})
         if working_hours?
-          client[room].send(user, message, options)
+          client[main_room].send(user, message, options)
         end
       end
 
@@ -50,12 +48,16 @@ module Flow
         @config['default_user']
       end
 
-      def room
-        @room ||= @config['room']
+      def main_room
+        @config['rooms']['main']
       end
 
       def uat_room
-        @room ||= @config['uat_room']
+        @config['rooms']['uat']
+      end
+
+      def logs_room
+        @config['rooms']['logs']
       end
 
       def client

@@ -72,12 +72,12 @@ module Flow
             id:                   request['comment']['id'],
             url:                  request['comment']['url'],
             html_url:             request['comment']['html_url'],
-            issue_url:            request['comment']['issue_url'],
             user_name:            request['comment']['user']['login'],
             created_at:           request['comment']['created_at'],
             updated_at:           request['comment']['updated_at'],
             body:                 request['comment']['body'],
             repo_name:            request['repository']['full_name'],
+            issue_url:            request['comment']['issue_url'],
             pull_request_number:  request['issue']['number'] }
 
         Flow::Workflow::Comment.new properties

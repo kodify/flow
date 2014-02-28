@@ -15,11 +15,12 @@ post '/payload' do
     request = JSON.parse(params[:payload])
     push    = Flow::Workflow::Push.new request['repository']['full_name']
     case env['HTTP_X_GITHUB_EVENT']
-      when 'issue_comment', 'pull_request_review_comment'
+      when 'issue_comment'
         push.new_comment request
       when 'status'
         push.status_update request
       else
+        puts 'not implemented'
     end
   end
 end

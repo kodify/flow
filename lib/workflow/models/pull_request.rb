@@ -142,7 +142,7 @@ module Flow
       end
 
       def issue_tracker_id
-        issue_tracker.branch_to_id(branch)
+        issue_tracker.branch_to_id(branch) or branch
       end
 
       def save_comments_to_be_discussed

@@ -20,7 +20,7 @@ module Flow
       # Will review bottlenecks on code review
       #
       def review_bottlenecks
-        pull_requests = open_pull_requests
+        pull_requests = non_reviewed_pull_requests
         notify_review(pull_requests) if pull_requests.length >= config['flow']['pending_pr_to_notify']
       end
 
@@ -45,14 +45,17 @@ module Flow
         notifier.say html_message, :notify => true, :message_format => 'html'
       end
 
-      def open_pull_requests
+      def non_reviewed_pull_requests
         pull_requests = []
         repos.each do |repo_name|
           puts "Processing repo #{repo_name}"
           Repo.new(repo_name).pull_requests.each do |pull_request|
-            status = pull_request.status
-            pull_requests << pull_request if status == :not_reviewed
-            puts "\t Pull request #{pull_request.branch} status #{status}"
+            if !pull_request.reviewed?
+              pull_requests << pull_request
+              puts "\t Pull request #{pull_request.branch} not reviewed"
+            else
+              puts "\t Pull request #{pull_request.branch} reviewed"
+            end
           end
         end
         pull_requests

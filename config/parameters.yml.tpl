@@ -1,7 +1,7 @@
 parameters:
   flow:
     pending_pr_to_notify: 3
-    pending_pr_interval_in_sec: 1800
+    token: yourTokenNumber
   dictionary:
     blocked: [ ':-1:', '[B]', '[b]' ]
     reviewed: [ ':+1:', '+1' ]

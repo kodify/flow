@@ -12,6 +12,7 @@ describe 'The FlowAPI' do
   let!(:issue_key)    { '0' }
   let!(:repos_number) { Flow::Config.get['projects'].length }
   let!(:pr)           { nil }
+  let!(:token)        { Flow::Config.get['flow']['token'] }
 
   def app
     Sinatra::Application
@@ -19,7 +20,7 @@ describe 'The FlowAPI' do
 
   describe '/ping' do
     it 'should respond to ping' do
-      get(:ping).body.should eq 'its alive'
+      get(:ping, { 'token' => token }).body.should eq 'its alive'
     end
   end
 
@@ -30,7 +31,7 @@ describe 'The FlowAPI' do
 
     describe "/pr/ok" do
       before do
-        post "/pr/#{issue_key}/ok"
+        post "/pr/#{issue_key}/ok", { 'token' => token }
       end
 
       describe 'with non valid params' do
@@ -73,7 +74,7 @@ describe 'The FlowAPI' do
 
     describe "/pr/ko" do
       before do
-        post "/pr/#{issue_key}/ko"
+        post "/pr/#{issue_key}/ko", { 'token' => token }
       end
 
       describe 'with non valid params' do
@@ -147,7 +148,7 @@ describe 'The FlowAPI' do
     end
 
     after do
-      post '/payload', { payload: payload }, {'HTTP_X_GITHUB_EVENT' => event}
+      post '/payload', { payload: payload, 'token' => token }, {'HTTP_X_GITHUB_EVENT' => event}
     end
 
     describe 'with issue_comment event' do

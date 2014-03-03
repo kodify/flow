@@ -2,8 +2,9 @@ require 'spec_helper'
 require File.join(base_path, 'lib', 'workflow', 'models', 'pull_request')
 
 describe 'PullRequest' do
-  let!(:scm)     { double('client') }
-  let!(:repo)       { double('repo') }
+  let!(:scm)        { double('client') }
+  let!(:repo)       { double('repo', related_repos: repos) }
+  let!(:repos)        { [] }
   let!(:pull)       { double('pull', title: title) }
   let!(:keyword)    { '' }
   let!(:title)      { "#{keyword} me" }
@@ -58,21 +59,21 @@ describe 'PullRequest' do
     end
     describe 'when repos does not contain any pull request with this id' do
       it 'should be true' do
-        subject.send(:all_repos_on_status?, repos).should be_true
+        subject.send(:all_repos_on_status?, :success).should be_true
       end
     end
     describe 'when repos contain a pull request with this id and it is success' do
       let!(:pulls_repo1) { success }
       let!(:pulls_repo2) { nil }
       it 'should be true' do
-        subject.send(:all_repos_on_status?, repos).should be_true
+        subject.send(:all_repos_on_status?, :success).should be_true
       end
     end
     describe 'when repos contain a pull request with this id and it is not success' do
       let!(:pulls_repo1) { success }
       let!(:pulls_repo2) { uat_ko }
       it 'should be true' do
-        subject.send(:all_repos_on_status?, repos).should be_false
+        subject.send(:all_repos_on_status?, :success).should be_false
       end
     end
   end

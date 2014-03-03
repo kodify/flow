@@ -1,3 +1,5 @@
+require File.join(File.dirname(__FILE__), '..', '..', 'config')
+
 module Flow
   module Workflow
     class Repo
@@ -22,6 +24,10 @@ module Flow
       def issue!(title, body = '', options = {})
         return if issue_exists(title)
         scm.create_issue(@name, title, body, options)
+      end
+
+      def related_repos
+        scm.related_repos
       end
 
       protected

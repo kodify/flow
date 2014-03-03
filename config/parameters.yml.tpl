@@ -32,7 +32,7 @@ parameters:
       class_name: Github
       login: github_login
       password: github_password
-      valid_repos: [ 'kodify/rule34', 'kodify/kumm', 'kodify/katt', 'kodify/CPP' ]
+      related_repos: [ ]
     jenkins:
       url: http://my_url:18181/job/
     scrutinizer:
@@ -56,6 +56,7 @@ parameters:
         dummy_notifier:
       source_control:
         github:
+          related_repos: []
     kodify/repo2:
       continuous_integration:
         dummy_ci:
@@ -65,3 +66,4 @@ parameters:
         dummy_notifier:
       source_control:
         github:
+          related_repos: []

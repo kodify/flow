@@ -17,12 +17,14 @@ module Flow
 
       def status
         @__status__ ||= begin
-          return :blocked       if blocked?
-          return :pending       if pending?
-          return :failed        if !green?
-          return :not_reviewed  if !reviewed?
-          return :uat_ko        if uat_ko?
-          return :not_uat       if !uat?
+          return :blocked                   if blocked?
+          return :pending                   if pending?
+          return :failed                    if !green?
+          return :not_reviewed              if !reviewed?
+          return :uat_ko                    if uat_ko?
+          return :not_reviewed_on_all_repos if !all_repos_on_status?(:not_uat)
+          return :not_uat                   if !uat?
+          return :not_success_on_all_repos  if !all_repos_on_status?(:success)
           :success
         end
       end
@@ -67,9 +69,9 @@ module Flow
 
       def move_away!
         case status
-          when :success # and pr.all_repos_on_status?(valid_repos)
+          when :success
             integrate!
-          when :not_uat # and pr.all_repos_on_status?(valid_repos, :not_uat)
+          when :not_uat
             to_uat!
           else
             if issue_tracker_id
@@ -118,8 +120,8 @@ module Flow
         @__statuses__[repo.name][sha] ||= scm.statuses(repo.name, sha)
       end
 
-      def all_repos_on_status?(repos = [], status = :success)
-        repos.each do |repo|
+      def all_repos_on_status?(status = :success)
+        repo.related_repos.each do |repo|
           pr = repo.pull_request_by_name(issue_tracker_id)
           next if pr.nil?
           return false unless pr.status == status

@@ -78,7 +78,17 @@ module Flow
         request['state'] == 'success'
       end
 
+      def related_repos
+        configured_related_repos.map do |repo_name|
+          Flow::Workflow::Repo.new(repo_name)
+        end
+      end
+
       protected
+
+      def configured_related_repos
+        config['related_repos']
+      end
 
       def client
         @__octokit_client__ ||= begin

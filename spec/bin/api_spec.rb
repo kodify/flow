@@ -179,6 +179,27 @@ describe 'The FlowAPI' do
             expect_any_instance_of(Flow::Workflow::DummyNotifier).to receive(:cant_flow)
           end
         end
+        describe 'and pull request has another related pull request' do
+          let!(:related_pull_request) { double('related', status: related_status) }
+          let!(:related_repos)        { [ Flow::Config.get['projects'].keys.first ] }
+          let!(:related_status)       { :not_reviewed }
+          before do
+            Octokit::Client.any_instance.stub(:pull_requests).and_return([])
+            Flow::Workflow::Github.any_instance.stub(:configured_related_repos).and_return(related_repos)
+            Flow::Workflow::Repo.any_instance.stub(:pull_request_by_name).and_return(related_pull_request)
+          end
+          describe 'and a related pull request not reviewed' do
+            it 'should say unmergeable' do
+              expect_any_instance_of(Flow::Workflow::DummyNotifier).to receive(:cant_flow)
+            end
+          end
+          describe 'and a related pull request is already reviewed' do
+            let!(:related_status)       { :success }
+            it 'should say unmergeable' do
+              expect_any_instance_of(Flow::Workflow::DummyNotifier).to receive(:cant_flow)
+            end
+          end
+        end
       end
 
       describe 'and comment body has a blocker comment' do

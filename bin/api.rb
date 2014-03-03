@@ -10,6 +10,11 @@ require File.join(path, 'lib', 'config')
 require File.join(path, 'lib', 'workflow', 'models', 'repo')
 require File.join(path, 'lib', 'workflow', 'push')
 
+before do
+  halt 403 unless params.include? 'token'
+  halt 403 unless Flow::Config.get['flow']['token'] == params['token']
+end
+
 post '/payload' do
   unless params.empty?
     request = JSON.parse(params[:payload])

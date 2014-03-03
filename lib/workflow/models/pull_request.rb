@@ -191,11 +191,11 @@ module Flow
       end
 
       def ci
-        Flow::Workflow::Factory.instance(repo.name, :continuous_integration)
+        @__ci__ ||= Flow::Workflow::Factory.instance(repo.name, :continuous_integration)
       end
 
       def issue_tracker
-        Flow::Workflow::Factory.instance(repo.name, :issue_tracker)
+        @__it__ ||= Flow::Workflow::Factory.instance(repo.name, :issue_tracker)
       end
 
     def notifier

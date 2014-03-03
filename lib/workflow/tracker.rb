@@ -48,8 +48,11 @@ module Flow
       def open_pull_requests
         pull_requests = []
         repos.each do |repo_name|
+          puts "Processing repo #{repo_name}"
           Repo.new(repo_name).pull_requests.each do |pull_request|
-            pull_requests << pull_request if pull_request.status == :not_reviewed
+            status = pull_request.status
+            pull_requests << pull_request if status == :not_reviewed
+            puts "\t Pull request #{pull_request.branch} status #{status}"
           end
         end
         pull_requests

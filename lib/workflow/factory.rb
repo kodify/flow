@@ -7,10 +7,7 @@ module Flow
   module Workflow
     class Factory
       def self.instance(repo, type, options = {})
-        type = type.to_s
-        @__ci_instances__ ||= {}
-        @__ci_instances__[type] ||= {}
-        @__ci_instances__[type][repo] ||= type_adapter_container(repo, type, options)
+        type_adapter_container(repo, type.to_s, options)
       end
 
       protected

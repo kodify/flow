@@ -32,19 +32,19 @@ describe 'Flow::Workflow::ScritinizerNew' do
 
       describe 'and scrutinizer build status as success' do
         let!(:status) { 'success' }
-        describe 'and valid metrics' do
+        describe 'and not valid metrics' do
           let!(:issues_number)  { 0 }
           let!(:complexity)     { 0 }
-          it { subject.is_green?(pull_request).should be_true }
-        end
-        describe 'and not valid metrics' do
-          let!(:issues_number)  { 999999 }
-          let!(:complexity)     { 999999 }
           it { subject.is_green?(pull_request).should be_false }
           it 'should make a comment on the pull request as not green' do
             expect(pull_request).to receive(:comment_not_green!)
             subject.is_green?(pull_request)
           end
+        end
+        describe 'and valid metrics' do
+          let!(:issues_number)  { 999999 }
+          let!(:complexity)     { 999999 }
+          it { subject.is_green?(pull_request).should be_true }
         end
       end
 

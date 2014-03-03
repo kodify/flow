@@ -53,7 +53,7 @@ module Flow
       def invalid_metrics
         invalid = {}
         config['metrics'].keys.each do |type|
-          if build_metrics[type].to_f <= config['metrics'][type].to_f
+          if build_metrics[type].to_f >= config['metrics'][type].to_f
             invalid[type] = { expected: config['metrics'][type].to_f, reported: build_metrics[type].to_f }
           end
         end
@@ -77,7 +77,7 @@ module Flow
 
       def send_metrics_report
         unless invalid_metrics.empty?
-          report = "Metric | Max. Expected | Your Results\r\n";
+          report = "\nMetric | Max. Expected | Your Results\r\n";
           report << "--- | --- | ---\r\n";
           invalid_metrics.each do |key, value|
             report <<  "#{key} | #{value[:expected]} | #{value[:reported]}\r\n"
@@ -92,7 +92,7 @@ module Flow
       end
 
       def curl(url)
-        `curl #{url}`
+        `curl -s #{url}`
       end
     end
   end

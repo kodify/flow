@@ -4,7 +4,7 @@ require File.join(File.dirname(__FILE__), 'continuous_integration')
 
 module Flow
   module Workflow
-    class ScrutinizerNew < Flow::Workflow::ContinuousIntegration
+    class Scrutinizer < Flow::Workflow::ContinuousIntegration
 
       def is_green?(pr)
         @pr = pr

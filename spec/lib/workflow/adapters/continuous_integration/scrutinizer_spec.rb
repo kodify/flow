@@ -14,7 +14,7 @@ describe 'Flow::Workflow::ScritinizerNew' do
   let!(:complexity)     { 2 }
   let!(:rels)           { { target: target} }
   let!(:target)         { double('target', href: 'https://scrutinizer-ci.com/g/owner/repo/inspections/inspectionId' )}
-  let!(:subject)        { Flow::Workflow::ScrutinizerNew.new(config) }
+  let!(:subject)        { Flow::Workflow::Scrutinizer.new(config) }
 
 
   describe '#is_green?' do

@@ -44,7 +44,8 @@ describe 'Flow::Workflow::Tracker' do
                                  branch: 'branch',
                                  text_link: 'link',
                                  html_link: 'html_link',
-                                 reviewed?: false) }
+                                 reviewed?: false,
+                                 ignore?: false) }
 
     before do
       Flow::Workflow::Repo.any_instance.stub(:pull_requests).and_return(pull_requests)

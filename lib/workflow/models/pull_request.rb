@@ -75,7 +75,7 @@ module Flow
             to_uat!
           else
             if issue_tracker_id
-              notifier.cant_flow issue_tracker_id, status
+              notifier.cant_flow self
             end
         end
       end

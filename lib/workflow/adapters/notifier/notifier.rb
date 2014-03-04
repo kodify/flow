@@ -22,8 +22,8 @@ module Flow
         say "Issue #{issue} moved to status #{status}", :notify => true
       end
 
-      def cant_flow(issue, status)
-        say "Issue #{issue} can't flow, status #{status}", :notify => true, :color => 'red'
+      def cant_flow(pull_request)
+        say "Issue #{pull_request.repo_name}::#{pull_request.branch} can't flow, status #{pull_request.status}", :notify => true, :color => 'red'
       end
 
       def say_merge_failed(issue)

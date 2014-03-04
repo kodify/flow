@@ -40,6 +40,12 @@ module Flow
       def request_status_success?(request)
       end
 
+      def request_status_error?(request)
+      end
+
+      def request_status_failed?(request)
+      end
+
     end
   end
 end

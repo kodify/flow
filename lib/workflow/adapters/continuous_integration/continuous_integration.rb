@@ -12,6 +12,10 @@ module Flow
         false
       end
 
+      def rebuild!(pr)
+
+      end
+
     end
   end
 end

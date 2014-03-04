@@ -21,6 +21,8 @@ module Flow
       def status_update(request)
         if scm.request_status_success?(request)
           pull_request(request).move_away!
+        elsif scm.request_status_error?(request)
+          pull_request(request).rebuild!
         end
       end
 

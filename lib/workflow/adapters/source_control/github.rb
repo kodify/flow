@@ -78,6 +78,14 @@ module Flow
         request['state'] == 'success'
       end
 
+      def request_status_error?(request)
+        request['state'] == 'error'
+      end
+
+      def request_status_failed?(request)
+        request['state'] == 'failed'
+      end
+
       def related_repos
         configured_related_repos.map do |repo_name|
           Flow::Workflow::Repo.new(repo_name)

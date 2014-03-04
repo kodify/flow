@@ -92,10 +92,14 @@ module Flow
 
       def client
         @__octokit_client__ ||= begin
-          Octokit::Client.new(
-              :login    => @config['login'],
-              :password => @config['password']
-          )
+          if @config.include? 'access_token'
+            Octokit::Client.new(:access_token => @config['access_token'])
+          else
+            Octokit::Client.new(
+                :login    => @config['login'],
+                :password => @config['password']
+            )
+          end
         end
       end
 

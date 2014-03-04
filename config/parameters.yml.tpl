@@ -32,6 +32,7 @@ parameters:
       class_name: Github
       login: github_login
       password: github_password
+      access_token: myToken
       related_repos: [ ]
     jenkins:
       url: http://my_url:18181/job/

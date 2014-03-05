@@ -46,6 +46,10 @@ module Flow
         say "\tCan't merge #{pr.number}, status '#{pr.status.to_s}'"
       end
 
+      def say_rebuild(pr)
+        say "#{pr.repo_name}::#{pr.branch} was rebuild through a build error"
+      end
+
       def say(msg, options = {})
       end
 

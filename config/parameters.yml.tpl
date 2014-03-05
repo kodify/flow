@@ -39,6 +39,10 @@ parameters:
     scrutinizer:
       url: https://scrutinizer-ci.com/api/repositories/g/
       token: xxxxx
+    travis:
+      class_name: 'Travis'
+      rebuild_patterns: []
+      max_rebuilds: 3
     dummy_notifier:
       class_name: 'DummyNotifier'
     dummy_ci:

@@ -60,10 +60,7 @@ module Flow
       end
 
       def rebuild!
-        # TODO: Check the rebuild counters
-        if ci.rebuild! self
-          # TODO: Has been rebuilded -> increment the counters
-        end
+        ci.rebuild! self
       end
 
       def ship_it!

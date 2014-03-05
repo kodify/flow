@@ -3,7 +3,8 @@ require File.join(File.dirname(__FILE__), 'continuous_integration')
 module Flow
   module Workflow
     class Travis < Flow::Workflow::ContinuousIntegration
-      @base_url = 'https://api.travis-ci.org/'
+      REBUILD_COMMENT = '[REBUILDING WITH TRAVIS]'
+      BASE_URL        = 'https://api.travis-ci.org/'
 
       def is_green?(pr)
         @pr = pr
@@ -25,15 +26,20 @@ module Flow
 
       def rebuild!(pr)
         @pr = pr
-        return if last_status.state == 'success'
+        last = last_status.state
+        return if last == 'success'
+        return if last == 'error' && !can_rebuild?
 
         sw = false
+        logs = ''
         jobs.each do |job|
           if needs_rebuild? job
             sw = true
             restart! job
+            logs = "```sh\n#{job_log(job)}\n```"
           end
         end
+        @pr.comment! "#{REBUILD_COMMENT} \n #{logs}" if sw
         sw
       end
 
@@ -54,6 +60,14 @@ module Flow
         end
       end
 
+      def can_rebuild?
+        count = 0
+        @pr.comments.each do |comment|
+          count += 1 if comment.body.include? REBUILD_COMMENT
+        end
+        count < config['max_rebuilds']
+      end
+
       def needs_rebuild?(job)
         return unless config['rebuild_patterns']
 
@@ -68,16 +82,17 @@ module Flow
       end
 
       def jobs
-        response = RestClient::Request.new(method: :get, url: "#{@base_url}builds/#{build_id}").execute
+        response = RestClient::Request.new(method: :get, url: "#{BASE_URL}builds/#{build_id}").execute
         response['build']['job_ids']
       end
 
       def job_log(job)
-        RestClient::Request.new(method: :get, url: "#{@base_url}jobs/#{job}").execute
+        @log ||= {}
+        @log[job] ||= RestClient::Request.new(method: :get, url: "#{BASE_URL}jobs/#{job}").execute
       end
 
       def restart!(job)
-        RestClient::Request.new(method: :post, url: "#{@base_url}jobs/#{job}/restart").execute
+        RestClient::Request.new(method: :post, url: "#{BASE_URL}jobs/#{job}/restart").execute
       end
 
     end

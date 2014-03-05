@@ -2,15 +2,17 @@ require 'spec_helper'
 require File.join(base_path, 'lib', 'workflow', 'adapters', 'continuous_integration', 'travis')
 
 describe 'Flow::Workflow::Travis' do
-  let!(:config)             { { 'url' => 'supu', 'project_name' => 'tupu', 'rebuild_patterns' => rebuild_patterns }}
+  let!(:config)             { { 'url' => 'supu', 'project_name' => 'tupu', 'rebuild_patterns' => rebuild_patterns, 'max_rebuilds' => max_rebuilds }}
   let!(:subject)            { Flow::Workflow::Travis.new(config) }
-  let!(:pull_request)       { double('pr', statuses: statuses, branch: 'supu') }
+  let!(:pull_request)       { double('pr', statuses: statuses, branch: 'supu', comments: comments) }
   let!(:statuses)           { [ travis_status ] }
   let!(:travis_status)      { double('travis_status', description: description, state: state) }
   let!(:non_travis_status)  { double('non_travis_status', description: description, state: state) }
   let!(:description)        { 'The Travis CI build bla bla bla' }
   let!(:state)              { 'success' }
   let!(:rebuild_patterns)   { [ 'Errno::ETIMEDOUT' ] }
+  let!(:comments)           { [] }
+  let!(:max_rebuilds)       { 3 }
 
   describe '#is_green?' do
     describe 'when pull request build status is success' do
@@ -86,14 +88,31 @@ describe 'Flow::Workflow::Travis' do
         expect(subject).to_not receive(:restart!).with
       end
     end
+    describe 'when travis last status is error and max rebuilds has been reached' do
+      let!(:state)            { 'error' }
+      let!(:comments)         { [ rebuild_comment, rebuild_comment, rebuild_comment ] }
+      let!(:rebuild_comment)  { double('rebuild_comment', body: Flow::Workflow::Travis::REBUILD_COMMENT) }
+      it 'should not ask the api for all jobs' do
+        expect(subject).to_not receive(:jobs)
+      end
+      it 'should not call travis api to restart any job' do
+        expect(subject).to_not receive(:restart!).with
+      end
+    end
     describe 'when travis last status is not success' do
       let!(:state) { 'failed' }
+      before do
+        pull_request.stub(:comment!).and_return('')
+      end
       it 'should ask the api for all jobs' do
         expect(subject).to receive(:jobs)
       end
       describe 'and any jobs contain rebuild patterns' do
         it 'should not call travis api to restart any job' do
           expect(subject).to_not receive(:restart!).with
+        end
+        it 'should comment rebuilding on the pull request' do
+          expect(pull_request).to_not receive(:comment!)
         end
       end
       describe 'and all jobs contain rebuild patterns' do
@@ -107,11 +126,17 @@ describe 'Flow::Workflow::Travis' do
           expect(subject).to receive(:restart!).with(1)
           expect(subject).to receive(:restart!).with(2)
         end
+        it 'should comment rebuilding on the pull request' do
+          expect(pull_request).to receive(:comment!)
+        end
       end
       describe 'and some jobs contain rebuild patterns' do
         before { subject.stub(:job_log).with(1).and_return(pattern_log) }
         it 'should call travis api to restart the job' do
           expect(subject).to receive(:restart!).with(1)
+        end
+        it 'should comment rebuilding on the pull request' do
+          expect(pull_request).to receive(:comment!)
         end
       end
     end

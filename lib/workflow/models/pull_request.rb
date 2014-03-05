@@ -60,7 +60,7 @@ module Flow
       end
 
       def rebuild!
-        ci.rebuild! self
+        notifier.say_rebuild(self) if ci.rebuild! self
       end
 
       def ship_it!

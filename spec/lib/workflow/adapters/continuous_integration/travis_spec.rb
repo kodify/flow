@@ -88,15 +88,27 @@ describe 'Flow::Workflow::Travis' do
         expect(subject).to_not receive(:restart!).with
       end
     end
-    describe 'when travis last status is error and max rebuilds has been reached' do
+    describe 'when travis last status is error' do
       let!(:state)            { 'error' }
-      let!(:comments)         { [ rebuild_comment, rebuild_comment, rebuild_comment ] }
       let!(:rebuild_comment)  { double('rebuild_comment', body: Flow::Workflow::Travis::REBUILD_COMMENT) }
-      it 'should not ask the api for all jobs' do
-        expect(subject).to_not receive(:jobs)
+      let!(:dummy_comment)    { double('dummy_comment', body: 'hello') }
+      describe 'and max rebuilds has not been reached' do
+        let!(:comments)         { [ dummy_comment, rebuild_comment, rebuild_comment ] }
+        it 'should ask the api for all jobs' do
+          expect(subject).to receive(:jobs)
+        end
+        it 'should not call travis api to restart any job' do
+          expect(subject).to_not receive(:restart!).with
+        end
       end
-      it 'should not call travis api to restart any job' do
-        expect(subject).to_not receive(:restart!).with
+      describe 'and max rebuilds has been reached' do
+        let!(:comments)         { [ rebuild_comment, rebuild_comment, rebuild_comment ] }
+        it 'should not ask the api for all jobs' do
+          expect(subject).to_not receive(:jobs)
+        end
+        it 'should not call travis api to restart any job' do
+          expect(subject).to_not receive(:restart!).with
+        end
       end
     end
     describe 'when travis last status is not success' do

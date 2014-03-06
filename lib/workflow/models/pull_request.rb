@@ -15,16 +15,16 @@ module Flow
         @comments = properties[:comments]
       end
 
-      def status
+      def status(standalone = nil)
         @__status__ ||= begin
-          return :blocked                   if blocked?
-          return :pending                   if pending?
-          return :failed                    if !green?
-          return :not_reviewed              if !reviewed?
-          return :uat_ko                    if uat_ko?
-          return :not_reviewed_on_all_repos if !all_repos_on_status?(:not_uat)
-          return :not_uat                   if !uat?
-          return :not_success_on_all_repos  if !all_repos_on_status?(:success)
+          return :blocked                     if blocked?
+          return :pending                     if pending?
+          return :failed                      if !green?
+          return :not_reviewed                if !reviewed?
+          return :uat_ko                      if uat_ko?
+          return :not_reviewed_on_all_repos   if !(!standalone.nil? or all_repos_on_status?(:not_uat))
+          return :not_uat                     if !uat?
+          return :not_success_on_all_repos    if !(!standalone.nil? or all_repos_on_status?(:success))
           :success
         end
       end
@@ -125,10 +125,10 @@ module Flow
       end
 
       def all_repos_on_status?(status = :success)
-        repo.related_repos.each do |repo|
-          pr = repo.pull_request_by_name(issue_tracker_id)
+        repo.related_repos.each do |related_repo|
+          pr = related_repo.pull_request_by_name(issue_tracker_id)
           next if pr.nil?
-          return false unless pr.status == status
+          return false unless pr.status(true) == status(true)
         end
         true
       end

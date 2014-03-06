@@ -73,6 +73,7 @@ describe 'Flow::Workflow::Travis' do
     before do
       subject.stub(:jobs).and_return([ 0, 1, 2 ])
       subject.stub(:restart!).and_return(true)
+      subject.stub(:clear_cache!).and_return(true)
       subject.stub(:job_log).with(0).and_return(first_log)
       subject.stub(:job_log).with(1).and_return(second_log)
       subject.stub(:job_log).with(2).and_return(third_log)
@@ -97,6 +98,9 @@ describe 'Flow::Workflow::Travis' do
         it 'should ask the api for all jobs' do
           expect(subject).to receive(:jobs)
         end
+        it 'should not reset travus cache' do
+          expect(subject).to_not receive(:clear_cache!)
+        end
         it 'should not call travis api to restart any job' do
           expect(subject).to_not receive(:restart!).with
         end
@@ -105,6 +109,9 @@ describe 'Flow::Workflow::Travis' do
         let!(:comments)         { [ rebuild_comment, rebuild_comment, rebuild_comment ] }
         it 'should not ask the api for all jobs' do
           expect(subject).to_not receive(:jobs)
+        end
+        it 'should not reset travus cache' do
+          expect(subject).to_not receive(:clear_cache!)
         end
         it 'should not call travis api to restart any job' do
           expect(subject).to_not receive(:restart!).with
@@ -120,6 +127,9 @@ describe 'Flow::Workflow::Travis' do
         expect(subject).to receive(:jobs)
       end
       describe 'and any jobs contain rebuild patterns' do
+        it 'should not reset travus cache' do
+          expect(subject).to_not receive(:clear_cache!)
+        end
         it 'should not call travis api to restart any job' do
           expect(subject).to_not receive(:restart!).with
         end
@@ -132,6 +142,9 @@ describe 'Flow::Workflow::Travis' do
           subject.stub(:job_log).with(0).and_return(pattern_log)
           subject.stub(:job_log).with(1).and_return(pattern_log)
           subject.stub(:job_log).with(2).and_return(pattern_log)
+        end
+        it 'should not reset travus cache' do
+          expect(subject).to receive(:clear_cache!).with pull_request
         end
         it 'should call travis api to restart all jobs' do
           expect(subject).to receive(:restart!).with(0)

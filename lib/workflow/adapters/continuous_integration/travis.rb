@@ -35,6 +35,7 @@ module Flow
         jobs.each do |job|
           if needs_rebuild? job
             sw = true
+            clear_cache! pr
             restart! job
             logs = "```sh\n#{job_log(job)}\n```"
           end
@@ -93,6 +94,11 @@ module Flow
 
       def restart!(job)
         RestClient::Request.new(method: :post, url: "#{BASE_URL}jobs/#{job}/restart").execute
+      end
+
+      def clear_cache!(pr)
+        split_repo = pr.repo_name.split '/'
+        RestClient::Request.new(method: :delete, url: "#{BASE_URL}repos/#{split_repo.first}/#{split_repo.last}/caches").execute
       end
 
     end

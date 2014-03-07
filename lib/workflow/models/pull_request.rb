@@ -171,14 +171,18 @@ module Flow
       protected
 
       def integrate!
-        if merge == false
-          if issue_tracker_id
-            notifier.say_merge_failed issue_tracker_id
+        if status == :success
+          if merge == false
+            if issue_tracker_id
+              notifier.say_merge_failed issue_tracker_id
+            end
+          else
+            delete_branch
+            to_done!
+            notifier.say_merged issue_tracker_id, branch
           end
         else
-          delete_branch
-          to_done!
-          notifier.say_merged issue_tracker_id, branch
+          notifier.say_merge_failed issue_tracker_id
         end
       end
 

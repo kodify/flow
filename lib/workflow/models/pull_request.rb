@@ -64,11 +64,15 @@ module Flow
       end
 
       def ship_it!
-        integrate!
+        comment! dictionary['uat_ok'][0]
       end
 
       def boom_it!
         comment! dictionary['uat_ko'][0]
+      end
+
+      def block_it!(message)
+        comment! "#{dictionary['blocked'][0]} - #{message}"
       end
 
       def move_away!
@@ -171,14 +175,21 @@ module Flow
       protected
 
       def integrate!
+        return if status != :success
         if merge == false
-          if issue_tracker_id
-            notifier.say_merge_failed issue_tracker_id
-          end
+          require_rebase
         else
           delete_branch
           to_done!
           notifier.say_merged issue_tracker_id, branch
+        end
+      end
+
+      def require_rebase
+        if issue_tracker_id
+          block_it! "Can't automerge this pull request"
+          to_in_progress!
+          notifier.say_merge_failed issue_tracker_id
         end
       end
 

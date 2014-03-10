@@ -53,7 +53,10 @@ module Flow
       def invalid_metrics
         invalid = {}
         config['metrics'].keys.each do |type|
-          if build_metrics[type].to_f >= config['metrics'][type].to_f
+          metrics   = config['metrics'][type].to_s.split
+          metrics.unshift('>=') if metrics.length <= 1
+          build     = build_metrics[type].to_f
+          if build.method(metrics.first).(metrics.last.to_f)
             invalid[type] = { expected: config['metrics'][type].to_f, reported: build_metrics[type].to_f }
           end
         end

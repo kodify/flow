@@ -144,6 +144,7 @@ describe 'The FlowAPI' do
 
     before do
       Octokit::Client.any_instance.stub(:pull_request).and_return(pull_request)
+      Octokit::Client.any_instance.stub(:add_comment).and_return(true)
       Flow::Workflow::DummyIt.any_instance.stub(:branch_to_id).and_return id
     end
 
@@ -173,11 +174,17 @@ describe 'The FlowAPI' do
           it 'should say unmergeable' do
             expect_any_instance_of(Flow::Workflow::DummyNotifier).to receive(:cant_flow)
           end
+          it 'should not do merge' do
+            expect_any_instance_of(Flow::Workflow::PullRequest).to_not receive(:merge)
+          end
         end
         describe 'and a previous blocker comment on the pull request' do
           let!(:comments) { [ comment_reviewed, comment_uat_ko ] }
           it 'should say unmergeable' do
             expect_any_instance_of(Flow::Workflow::DummyNotifier).to receive(:cant_flow)
+          end
+          it 'should not do merge' do
+            expect_any_instance_of(Flow::Workflow::PullRequest).to_not receive(:merge)
           end
         end
         describe 'and pull request has another related pull request' do
@@ -193,11 +200,17 @@ describe 'The FlowAPI' do
             it 'should say unmergeable' do
               expect_any_instance_of(Flow::Workflow::DummyNotifier).to receive(:cant_flow)
             end
+            it 'should not do merge' do
+              expect_any_instance_of(Flow::Workflow::PullRequest).to_not receive(:merge)
+            end
           end
           describe 'and a related pull request is already reviewed' do
             let!(:related_status)       { :success }
             it 'should say unmergeable' do
               expect_any_instance_of(Flow::Workflow::DummyNotifier).to receive(:cant_flow)
+            end
+            it 'should not do merge' do
+              expect_any_instance_of(Flow::Workflow::PullRequest).to_not receive(:merge)
             end
           end
         end
@@ -217,6 +230,95 @@ describe 'The FlowAPI' do
         let!(:comments) { [ comment_reviewed ] }
         it 'should exit without doing any query' do
           expect_any_instance_of(Flow::Workflow::PullRequest).to_not receive(:uat_ko?)
+        end
+      end
+
+      describe 'and comment body has a uat ok comment' do
+        let!(:body)             { config['dictionary']['uat_ok'].first }
+        let!(:pull_requests)    { [ pull_request ] }
+        let!(:comments)         { [ comment_uat_ok, comment_reviewed ] }
+        let!(:merge_response)   { true }
+
+        before do
+          Octokit::Client.any_instance.stub(:pull_requests).and_return(pull_requests)
+          Octokit::Client.any_instance.stub(:merge_pull_request).and_return({ 'merged' => merge_response })
+          Octokit::Client.any_instance.stub(:delete_ref).and_return true
+          Flow::Workflow::PullRequest.any_instance.stub(:all_repos_on_status?).with(:not_uat).and_return(true)
+          Flow::Workflow::PullRequest.any_instance.stub(:all_repos_on_status?).with(:success).and_return(true)
+        end
+
+        describe 'when pull request is success' do
+          describe 'and has non success related pull requests' do
+            before do
+              Flow::Workflow::PullRequest.any_instance.stub(:all_repos_on_status?).with(:success).and_return(false)
+            end
+            it 'should not move issue to done on the issue tracker' do
+              expect_any_instance_of(Flow::Workflow::DummyIt).to_not receive(:do_move).with(:done, id)
+            end
+          end
+          describe 'and has success related pull requests' do
+            before do
+              Flow::Workflow::PullRequest.any_instance.stub(:all_repos_on_status?).with(:success).and_return(true)
+            end
+            it 'should merge the pull request' do
+              expect_any_instance_of(Octokit::Client).to receive(:merge_pull_request).with(repo, number, "#{branch} #UAT-OK - PR #{number} merged")
+            end
+            it 'should remove the pull request related branch' do
+              expect_any_instance_of(Octokit::Client).to receive(:delete_ref).with(repo, "heads/#{branch}")
+            end
+            it 'should move issue to done on the issue tracker' do
+              expect_any_instance_of(Flow::Workflow::DummyIt).to receive(:do_move).with(:done, id)
+            end
+            it 'should notify branch is merged' do
+              expect_any_instance_of(Flow::Workflow::DummyNotifier).to receive(:say_merged)
+            end
+            describe "and can't merge pull request" do
+              before do
+                Flow::Workflow::PullRequest.any_instance.stub(:merge).and_return(false)
+              end
+              it 'should move the issue to in progress' do
+                expect_any_instance_of(Flow::Workflow::DummyIt).to receive(:do_move).with(:uat_nok, id)
+              end
+              it 'should block the pull request' do
+                expect_any_instance_of(Flow::Workflow::PullRequest).to receive(:block_it!).with("Can't automerge this pull request")
+              end
+            end
+          end
+        end
+
+        describe 'when pull request is not success' do
+          let!(:comments)  { [ comment_reviewed ] }
+          it 'should not merge the pull request' do
+            expect_any_instance_of(Octokit::Client).to_not receive(:merge_pull_request).with(repo, number, "#{branch} #UAT-OK - PR #{number} merged")
+          end
+          it 'should not remove the pull request related branch' do
+            expect_any_instance_of(Octokit::Client).to_not receive(:delete_ref).with(repo, "heads/#{branch}")
+          end
+          it 'should not move issue to done on the issue tracker' do
+            expect_any_instance_of(Flow::Workflow::DummyIt).to_not receive(:do_move).with(:done, id)
+          end
+          it 'should not notify branch is merged' do
+            expect_any_instance_of(Flow::Workflow::DummyNotifier).to_not receive(:say_merged)
+          end
+        end
+
+        describe 'when pull request is not mergeable' do
+          let!(:merge_response) { false }
+          it 'should try to merge the pull request' do
+            expect_any_instance_of(Octokit::Client).to receive(:merge_pull_request).with(repo, number, "#{branch} #UAT-OK - PR #{number} merged")
+          end
+          it 'should not remove the pull request related branch' do
+            expect_any_instance_of(Octokit::Client).to_not receive(:delete_ref).with(repo, "heads/#{branch}")
+          end
+          it 'should not move issue to done on the issue tracker' do
+            expect_any_instance_of(Flow::Workflow::DummyIt).to_not receive(:do_move).with(:done, id)
+          end
+          it 'should not notify branch is merged' do
+            expect_any_instance_of(Flow::Workflow::DummyNotifier).to_not receive(:say_merged)
+          end
+          it "should notify branch can't be merged" do
+            expect_any_instance_of(Flow::Workflow::DummyNotifier).to receive(:say_merge_failed)
+          end
         end
       end
     end

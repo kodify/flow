@@ -139,8 +139,7 @@ module Flow
 
       def merge
         message = "#{@branch} #UAT-OK - PR #{number} merged"
-        response = scm.merge_pull_request(repo.name, @number, message)
-        response['merged']
+        scm.merge_pull_request(repo.name, @number, message)
       rescue
         false
       end

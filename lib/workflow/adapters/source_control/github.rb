@@ -17,7 +17,10 @@ module Flow
       end
 
       def merge_pull_request(repo, number, body)
-        client.merge_pull_request repo, number, body
+        response = client.merge_pull_request repo, number, body
+        return false unless response.kind_of?(Hash)
+        return false unless response.include? 'merged'
+        response['merged']
       end
 
       def delete_ref(repo, ref)

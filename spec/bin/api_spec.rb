@@ -141,6 +141,8 @@ describe 'The FlowAPI' do
     let!(:payload)  { mock_template('github', 'issue_comment', ':comment_body:' => body, ':repo_name:' => repo, ':pull_request_number:' => number.to_s) }
     let!(:body)     { 'Hello' }
     let!(:repo)     { config['projects'].keys.first }
+    let!(:merge_response)   { true }
+    let!(:octokit_response) { double('octokit_response', attrs: { :merged => merge_response } ) }
 
     before do
       Octokit::Client.any_instance.stub(:pull_request).and_return(pull_request)
@@ -237,11 +239,10 @@ describe 'The FlowAPI' do
         let!(:body)             { config['dictionary']['uat_ok'].first }
         let!(:pull_requests)    { [ pull_request ] }
         let!(:comments)         { [ comment_uat_ok, comment_reviewed ] }
-        let!(:merge_response)   { true }
 
         before do
           Octokit::Client.any_instance.stub(:pull_requests).and_return(pull_requests)
-          Octokit::Client.any_instance.stub(:merge_pull_request).and_return({ 'merged' => merge_response })
+          Octokit::Client.any_instance.stub(:merge_pull_request).and_return(octokit_response)
           Octokit::Client.any_instance.stub(:delete_ref).and_return true
           Flow::Workflow::PullRequest.any_instance.stub(:all_repos_on_status?).with(:not_uat).and_return(true)
           Flow::Workflow::PullRequest.any_instance.stub(:all_repos_on_status?).with(:success).and_return(true)
@@ -344,7 +345,7 @@ describe 'The FlowAPI' do
 
         before do
           Octokit::Client.any_instance.stub(:pull_requests).and_return(pull_requests)
-          Octokit::Client.any_instance.stub(:merge_pull_request).and_return({ 'merged' => merge_response })
+          Octokit::Client.any_instance.stub(:merge_pull_request).and_return(octokit_response)
           Octokit::Client.any_instance.stub(:delete_ref).and_return true
         end
 

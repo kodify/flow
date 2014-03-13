@@ -14,6 +14,7 @@ module Flow
 
       def self.type_adapter_container(repo, type, options)
         container = AdapterContainer.new
+        repo = 'default' unless Flow::Config.get['projects'].include? repo
         raise "Non configured repo #{repo}" unless Flow::Config.get['projects'].include? repo
         raise "Non configured #{type} for #{repo} repo" unless Flow::Config.get['projects'][repo].include? type
         Flow::Config.get['projects'][repo][type].each do |adapter_name, custom_config|

@@ -50,7 +50,7 @@ module Flow
         repos.each do |repo_name|
           puts "Processing repo #{repo_name}"
           Repo.new(repo_name).pull_requests.each do |pull_request|
-            if !pull_request.reviewed? && !pull_request.ignore?
+            if !pull_request.reviewed? && !pull_request.ignore? && !pull_request.blocked?
               pull_requests << pull_request
               puts "\t Pull request #{pull_request.branch} not reviewed"
             else

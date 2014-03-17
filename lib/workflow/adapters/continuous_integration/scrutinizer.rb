@@ -39,10 +39,11 @@ module Flow
 
       def valid_metrics?
         status = request_build_info['state']
-        if ['failed', 'canceled'].include? status
+        #FIXME : Canceled stuff is a temporary fix reevaluate it on 25 March 2014
+        if ['failed'].include? status
           @pr.comment_not_green! "Pull request marked as #{status} by Scrutinizer"
           return false
-        elsif invalid_metrics.empty?
+        elsif invalid_metrics.empty? || 'canceled' == status
           return true
         else
           send_metrics_report

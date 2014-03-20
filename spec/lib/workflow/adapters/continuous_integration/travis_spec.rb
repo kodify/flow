@@ -4,7 +4,7 @@ require File.join(base_path, 'lib', 'workflow', 'adapters', 'continuous_integrat
 describe 'Flow::Workflow::Travis' do
   let!(:config)             { { 'url' => 'supu', 'project_name' => 'tupu', 'rebuild_patterns' => rebuild_patterns, 'max_rebuilds' => max_rebuilds }}
   let!(:subject)            { Flow::Workflow::Travis.new(config) }
-  let!(:pull_request)       { double('pr', statuses: statuses, branch: 'supu', comments: comments) }
+  let!(:pull_request)       { double('pr', statuses: statuses, branch: 'supu', comments: comments, log: '') }
   let!(:statuses)           { [ travis_status ] }
   let!(:travis_status)      { double('travis_status', description: description, state: state) }
   let!(:non_travis_status)  { double('non_travis_status', description: description, state: state) }

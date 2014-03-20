@@ -73,6 +73,7 @@ module Flow
         return unless config['rebuild_patterns']
 
         log = job_log(job)
+        @pr.log "[TRAVIS LOGS] : #{log}"
         config['rebuild_patterns'].any? do |pattern|
           log.include? pattern
         end

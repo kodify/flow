@@ -171,6 +171,10 @@ module Flow
         "<a href=\"https://github.com/#{repo_name}/pull/#{@number}\">https://github.com/#{repo_name}/pull/#{@number}</a>"
       end
 
+      def log(log_message)
+        notifier.log log_message
+      end
+
       protected
 
       def integrate!

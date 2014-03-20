@@ -9,6 +9,10 @@ module Flow
         super
       end
 
+      def log(log_message)
+        say log_message
+      end
+
       def say_uat_bottlenecks(count, list)
         message = "There are #{count} PR ready to be uated: #{list}"
         say_on_uat_room(default_user, message, options = {})

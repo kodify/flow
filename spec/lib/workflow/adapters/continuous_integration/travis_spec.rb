@@ -107,8 +107,8 @@ describe 'Flow::Workflow::Travis' do
       end
       describe 'and max rebuilds has been reached' do
         let!(:comments)         { [ rebuild_comment, rebuild_comment, rebuild_comment ] }
-        it 'should not ask the api for all jobs' do
-          expect(subject).to_not receive(:jobs)
+        it 'should not the api for all jobs' do
+          expect(subject).to receive(:jobs)
         end
         it 'should not reset travus cache' do
           expect(subject).to_not receive(:clear_cache!)

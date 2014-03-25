@@ -28,6 +28,7 @@ module Flow
         @pr = pr
         last = last_status.state
         return if last == 'success'
+        log_errors
         return if last == 'error' && !can_rebuild?
 
         sw = false
@@ -45,6 +46,12 @@ module Flow
       end
 
       protected
+
+      def log_errors
+        jobs.each do |job|
+          @pr.log "[TRAVIS LOGS] : #{job_log(job)}" if needs_rebuild? job
+        end
+      end
 
       def build_status?(state)
         status = last_status
@@ -73,7 +80,6 @@ module Flow
         return unless config['rebuild_patterns']
 
         log = job_log(job)
-        @pr.log "[TRAVIS LOGS] : #{log}"
         config['rebuild_patterns'].any? do |pattern|
           log.include? pattern
         end

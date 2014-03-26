@@ -13,7 +13,7 @@ module Flow
       end
 
       def url
-        "#{@issue_tracker.url}#{@key}/browse/"
+        "#{@issue_tracker.url}/browse/#{@key}"
       end
 
       def html_link

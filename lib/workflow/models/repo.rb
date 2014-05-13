@@ -35,35 +35,15 @@ module Flow
       end
 
       def update_dependent(where,submodule_path, branch)
-        clean_repo("#{where}/#{project_name}")
-        `cd #{where}/#{project_name}
-        git checkout .
-        git checkout master
-        git fetch origin
-        git rebase origin/master`
-        `cd #{where}/#{project_name}
-        git checkout -b #{branch}`
-        clean_repo("#{where}/#{project_name}/#{submodule_path}")
-        `cd #{where}/#{project_name}/#{submodule_path}
-        git checkout .
-        git checkout #{branch}
-        git rebase origin/#{branch}; true`
-      end
-
-      def clean_repo(path)
-        `cd #{path}
-          git fetch origin
-          git checkout .`
+        scm.clean_repo("#{where}/#{project_name}")
+        scm.put_branch_on_path('master', "#{where}/#{project_name}")
+        scm.create_branch_on_path(branch, "#{where}/#{project_name}")
+        scm.clean_repo("#{where}/#{project_name}/#{submodule_path}")
+        scm.put_branch_on_path(branch, "#{where}/#{project_name}/#{submodule_path}")
       end
 
       def create_pull_request(where, submodule_path, branch, comment)
-        `cd #{where}/#{project_name}/
-        git add #{submodule_path}
-        git commit -m 'update submodule for #{comment} on #{submodule_path}'`
-        `cd #{where}/#{project_name}/
-        git push origin #{branch}`
-        `cd #{where}/#{project_name}/
-        hub pull-request -m 'update submodule for #{comment}'`
+        scm.create_pull_request(where,submodule_path,branch,comment, project_name)
       end
 
       def repo_url
@@ -75,15 +55,7 @@ module Flow
       end
 
       def clone_into(path)
-          repo = repo_url
-          `rm -rf #{path}/#{project_name}/
-          mkdir -p #{path}
-          cd #{path}
-          git clone #{repo}; true`
-          `cd #{path}/#{project_name}/
-          git pull origin master
-          git submodule init
-          git submodule update; true`
+          scm.clone_project_into(repo_url, path, project_name)
       end
 
       protected

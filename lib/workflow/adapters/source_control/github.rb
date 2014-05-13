@@ -103,6 +103,48 @@ module Flow
         end
       end
 
+
+      def clean_repo(path)
+        `cd #{path}
+          git fetch origin
+          git checkout .`
+      end
+
+      def put_branch_on_path(branch, path)
+
+        `cd #{path}
+        git checkout .
+        git checkout #{branch}
+        git fetch origin
+        git rebase origin/#{branch}`
+      end
+
+      def create_branch_on_path(branch, path)
+        `cd #{path}
+        git checkout -b #{branch}`
+      end
+
+      def create_pull_request(where, submodule_path, branch, comment, project_name)
+        `cd #{where}/#{project_name}/
+        git add #{submodule_path}
+        git commit -m 'update submodule for #{comment} on #{submodule_path}'`
+        `cd #{where}/#{project_name}/
+        git push origin #{branch}`
+        `cd #{where}/#{project_name}/
+        hub pull-request -m 'update submodule for #{comment}'`
+      end
+
+      def clone_project_into(repo, path, project_name)
+        `rm -rf #{path}/#{project_name}/
+          mkdir -p #{path}
+          cd #{path}
+          git clone #{repo}; true`
+        `cd #{path}/#{project_name}/
+          git pull origin master
+          git submodule init
+          git submodule update; true`
+      end
+
       protected
       def configured_dependent_repos
         config['dependent_repos']

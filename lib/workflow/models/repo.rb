@@ -51,7 +51,7 @@ module Flow
       end
 
       def project_name
-        'parent'
+        name.split('/').last
       end
 
       def clone_into(path)

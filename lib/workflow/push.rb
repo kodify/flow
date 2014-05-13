@@ -27,8 +27,8 @@ module Flow
       end
 
       def new_pr(request)
-        require 'byebug';byebug
-        pull_request(request).treat_dependent
+        pr = pull_request(request)
+        pr.treat_dependent
       end
 
       protected

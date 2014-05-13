@@ -98,10 +98,9 @@ module Flow
       end
 
       def dependent_repos
-        require 'byebug';byebug
         return [] if configured_dependent_repos.nil?
         configured_dependent_repos.map do |repo|
-          [Flow::Workflow::Repo.new(repo['name']), repo['path']]
+          [Flow::Workflow::Repo.new(repo['name']), repo['path']] if !repo.nil?
         end
       end
 

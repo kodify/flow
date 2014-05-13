@@ -138,6 +138,7 @@ module Flow
       end
 
       def treat_dependent
+        require 'byebug'; byebug
         repo.dependent_repos.each do |dependent_repo|
           repo =  dependent_repo[0]
           submodule_path = dependent_repo[1]

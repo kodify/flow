@@ -34,6 +34,9 @@ module Flow
       def pull_request(repo_name, pull_request_number)
       end
 
+      def pull_request_from_request(request)
+      end
+
       def comment_from_request(request)
       end
 

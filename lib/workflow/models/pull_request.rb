@@ -137,6 +137,19 @@ module Flow
         true
       end
 
+      def treat_dependent
+        repo.dependent_repos.each do |dependent_repo|
+          repo =  dependent_repo[0]
+          submodule_path = dependent_repo[1]
+          where = '/tmp/repos'
+          repo.clone_into(where)
+          repo.update_dependent(where,submodule_path, branch)
+          repo.create_pull_request(where,submodule_path, branch, title)
+          true
+        end
+
+      end
+
       def merge
         message = "#{@branch} #UAT-OK - PR #{number} merged"
         scm.merge_pull_request(repo.name, @number, message)

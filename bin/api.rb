@@ -24,6 +24,12 @@ post '/payload' do
         push.new_comment request
       when 'status'
         push.status_update request
+      when 'pull_request'
+        if (push.new_pr request)
+          status 200
+          response = :success
+          json response
+        end
       else
         puts 'not implemented'
     end

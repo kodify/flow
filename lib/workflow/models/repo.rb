@@ -30,6 +30,69 @@ module Flow
         scm.related_repos
       end
 
+      def dependent_repos
+        scm.dependent_repos
+      end
+
+      def update_dependent(where,submodule_path, branch)
+        clean_repo("#{where}/#{project_name}")
+        puts "Moving #{where}/#{project_name} to Master branch"
+        `cd #{where}/#{project_name}
+        git checkout .
+        git checkout master
+        git fetch origin
+        git rebase origin/master`
+        puts "Creating branch #{branch}"
+        `cd #{where}/#{project_name}
+        git checkout -b #{branch}`
+        clean_repo("#{where}/#{project_name}/#{submodule_path}")
+        puts "Moving to branch #{branch} on submodule #{submodule_path}"
+        `cd #{where}/#{project_name}/#{submodule_path}
+        git checkout .
+        git checkout #{branch}
+        git rebase origin/#{branch}; true`
+      end
+
+      def clean_repo(path)
+        puts "cleaning #{path}"
+        `cd #{path}
+          git fetch origin
+          git checkout .`
+      end
+
+      def create_pull_request(where, submodule_path, branch, comment)
+        puts "Creating commit"
+        `cd #{where}/#{project_name}/
+        git add #{submodule_path}
+        git commit -m 'update submodule for #{comment} on #{submodule_path}'`
+        puts "Push to origin"
+        `cd #{where}/#{project_name}/
+        git push origin #{branch}`
+        puts "Creating pull request"
+        `cd #{where}/#{project_name}/
+        hub pull-request -m 'update submodule for #{comment}'`
+      end
+
+      def repo_url
+        'git@github.com:'+name+'.git'
+      end
+
+      def project_name
+        'parent'
+      end
+
+      def clone_into(path)
+          repo = repo_url
+          `rm -rf #{path}/#{project_name}/
+          mkdir -p #{path}
+          cd #{path}
+          git clone #{repo}; true`
+          `cd #{path}/#{project_name}/
+          git pull origin master
+          git submodule init
+          git submodule update; true`
+      end
+
       protected
 
       def pulls

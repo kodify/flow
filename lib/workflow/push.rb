@@ -26,6 +26,10 @@ module Flow
         end
       end
 
+      def new_pr(request)
+        pull_request(request).treat_dependent
+      end
+
       protected
 
       def pull_request(request)

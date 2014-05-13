@@ -14,6 +14,7 @@ gem 'net-ssh'
 
 gem 'octokit'
 gem 'hipchat'
+gem 'hub'
 
 gem "rest-client", "~> 1.6.7"
 
@@ -24,7 +25,7 @@ group :development, :test do
   gem 'rspec'
   gem 'shoulda', '>= 0'
   gem 'rdoc', '~> 3.12'
-  gem 'bundler', '~> 1.3.5'
+  gem 'bundler', '~> 1.6.2'
   gem 'jeweler', "~> 1.8.4"
   gem 'codeclimate-test-reporter', :require => nil
 end

@@ -49,6 +49,21 @@ module Flow
       def request_status_failed?(request)
       end
 
+      def clean_repo(path)
+      end
+
+      def put_branch_on_path(branch, path)
+      end
+
+      def create_branch_on_path(branch, path)
+      end
+
+      def create_pull_request(where, submodule_path, branch, comment, project_name)
+      end
+
+      def clone_project_into(repo, path, project_name)
+      end
+
     end
   end
 end

@@ -103,7 +103,6 @@ module Flow
         end
       end
 
-
       def clean_repo(path)
         `cd #{path}
           git fetch origin

@@ -57,21 +57,29 @@ module Flow
       end
 
       def comment_from_request(request)
-        Flow::Workflow::Comment.new({
-          id:                   request['comment']['id'],
-          url:                  request['comment']['url'],
-          html_url:             request['comment']['html_url'],
-          user_name:            request['comment']['user']['login'],
-          created_at:           request['comment']['created_at'],
-          updated_at:           request['comment']['updated_at'],
-          body:                 request['comment']['body'],
-          repo_name:            request['repository']['full_name'],
-          issue_url:            request['comment']['issue_url'],
-          pull_request_number:  request['issue']['number']
+        Flow::Workflow::Comment.new({ id:                   request['comment']['id'],
+                                      url:                  request['comment']['url'],
+                                      html_url:             request['comment']['html_url'],
+                                      user_name:            request['comment']['user']['login'],
+                                      created_at:           request['comment']['created_at'],
+                                      updated_at:           request['comment']['updated_at'],
+                                      body:                 request['comment']['body'],
+                                      repo_name:            request['repository']['full_name'],
+                                      issue_url:            request['comment']['issue_url'],
+                                      pull_request_number:  request['issue']['number']
         })
       end
 
+
       def pull_request_from_request(request)
+        repo      = Repo.new request['repository']['full_name']
+        sha       = request['branches'].first['commit']['sha']
+        pull_requests(repo).each do |pr|
+          return pr if pr.sha == sha
+        end
+      end
+
+      def pull_request_object_from_pull_request(request)
         repo      = Repo.new request['repository']['full_name']
         return false if request['pull_request'].nil?
 

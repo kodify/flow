@@ -35,6 +35,10 @@ module Flow
 
       protected
 
+      def pull_request_from_pull_request(request)
+        scm.pull_request_object_from_pull_request request
+      end
+
       def pull_request(request)
         scm.pull_request_from_request request
       end

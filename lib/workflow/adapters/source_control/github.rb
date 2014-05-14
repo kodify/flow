@@ -73,6 +73,8 @@ module Flow
 
       def pull_request_from_request(request)
         repo      = Repo.new request['repository']['full_name']
+        return false if request['pull_request'].nil?
+
         sha       = request['pull_request']['head']['sha']
         pull_requests(repo).each do |pr|
           return pr if pr.sha == sha

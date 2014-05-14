@@ -49,21 +49,14 @@ module Flow
       def request_status_failed?(request)
       end
 
-      def clean_repo(path)
+      def dependent_repos
       end
 
-      def put_branch_on_path(branch, path)
+      def update_dependent(where, submodule_path, branch, project_name)
       end
 
-      def create_branch_on_path(branch, path)
+      def pull_request_object_from_pull_request(request)
       end
-
-      def create_pull_request(where, submodule_path, branch, comment, project_name)
-      end
-
-      def clone_project_into(repo, path, project_name)
-      end
-
     end
   end
 end

@@ -27,10 +27,15 @@ module Flow
       end
 
       def new_pr(request)
-        pull_request(request).treat_dependent
+        pr = pull_request_from_pull_request(request)
+        pr.treat_dependent if pr
       end
 
       protected
+
+      def pull_request_from_pull_request(request)
+        scm.pull_request_object_from_pull_request request
+      end
 
       def pull_request(request)
         scm.pull_request_from_request request

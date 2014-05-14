@@ -139,15 +139,13 @@ module Flow
 
       def treat_dependent
         repo.dependent_repos.each do |dependent_repo|
-          repo =  dependent_repo[0]
+          repository =  dependent_repo[0]
           submodule_path = dependent_repo[1]
           where = '/tmp/repos'
-          repo.clone_into(where)
-          repo.update_dependent(where,submodule_path, branch)
-          repo.create_pull_request(where,submodule_path, branch, title)
-          true
+          repository.clone_into(where)
+          repository.update_dependent(where,submodule_path, branch)
+          repository.create_pull_request(where,submodule_path, branch, title)
         end
-
       end
 
       def merge

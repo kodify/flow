@@ -72,3 +72,4 @@ parameters:
       source_control:
         github:
           related_repos: []
+          dependent_repos: [{name: kodify/repo1, path: /submodule_path}]

@@ -116,7 +116,7 @@ describe 'The FlowAPI' do
     end
   end
 
-  describe 'when a webhook call payload' do
+  describe 'when a webhook calls payload' do
     let!(:event)        { '' }
     let!(:payload)      { '' }
     let!(:body)         { 'Hello' }
@@ -148,10 +148,46 @@ describe 'The FlowAPI' do
       Octokit::Client.any_instance.stub(:pull_request).and_return(pull_request)
       Octokit::Client.any_instance.stub(:add_comment).and_return(true)
       Flow::Workflow::DummyIt.any_instance.stub(:branch_to_id).and_return id
+      Flow::Workflow::Github.any_instance.stub(:clean_repo).and_return true
+      Flow::Workflow::Github.any_instance.stub(:put_branch_on_path).and_return true
+      Flow::Workflow::Github.any_instance.stub(:create_branch_on_path).and_return true
+      Flow::Workflow::Github.any_instance.stub(:create_pull_request).and_return true
+      Flow::Workflow::Github.any_instance.stub(:clone_project_into).and_return true
     end
 
     after do
       post '/payload', { payload: payload, 'token' => token }, {'HTTP_X_GITHUB_EVENT' => event}
+    end
+
+    describe 'with pull_request event' do
+      let!(:event)    { 'pull_request' }
+      let!(:payload)  { mock_template('github', 'pull_request', ':repo_name:' => repo, ':pull_request_number:' => number.to_s, ':sha:' => sha) }
+      before do
+        Flow::Workflow::Github.any_instance.stub(:update_dependent)
+      end
+      describe 'And NOT dependent repos related' do
+        let!(:pull_request) {Flow::Workflow::PullRequest.new(Flow::Workflow::Repo.new(repo),{})}
+        before do
+          Flow::Workflow::Github.any_instance.stub(:pull_request_object_from_pull_request).and_return(pull_request)
+        end
+        it 'should NOT create a pull request to related repository' do
+          expect_any_instance_of(Flow::Workflow::Github).not_to receive(:update_dependent)
+        end
+      end
+      describe 'And some dependent repos related' do
+        let!(:repo_to_use) { Flow::Workflow::Repo.new(repo) }
+        before do
+          pull_request = Flow::Workflow::PullRequest.new(repo_to_use,{})
+          Flow::Workflow::Github.any_instance.stub(:pull_request_object_from_pull_request).and_return(pull_request)
+
+          config['projects'].values.first['source_control']['github']['dependent_repos'] = [{'name' => "kodify/repo1", 'path' => "/submodule_path"}]
+        end
+
+        it 'should create a pull request to related repository' do
+          expect_any_instance_of(Flow::Workflow::Github).to receive(:update_dependent)
+        end
+      end
+
     end
 
     describe 'with issue_comment event' do

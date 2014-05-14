@@ -108,9 +108,8 @@ module Flow
       end
 
       def dependent_repos
-        return [] if configured_dependent_repos.nil?
         configured_dependent_repos.map do |repo|
-          [Flow::Workflow::Repo.new(repo['name']), repo['path']] if !repo.nil?
+          [Flow::Workflow::Repo.new(repo['name']), repo['path']] unless repo == []
         end
       end
 
@@ -157,7 +156,7 @@ module Flow
 
       protected
       def configured_dependent_repos
-        config['dependent_repos']
+        config['dependent_repos'].to_a
       end
 
       def configured_related_repos

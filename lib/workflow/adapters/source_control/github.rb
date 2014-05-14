@@ -113,6 +113,24 @@ module Flow
         end
       end
 
+      def update_dependent(where, submodule_path, branch, project_name)
+        clean_repo("#{where}/#{project_name}")
+        put_branch_on_path('master', "#{where}/#{project_name}")
+        create_branch_on_path(branch, "#{where}/#{project_name}")
+        clean_repo("#{where}/#{project_name}/#{submodule_path}")
+        put_branch_on_path(branch, "#{where}/#{project_name}/#{submodule_path}")
+      end
+
+      protected
+
+      def configured_dependent_repos
+        config['dependent_repos'].to_a
+      end
+
+      def configured_related_repos
+        config['related_repos']
+      end
+
       def clean_repo(path)
         `cd #{path}
           git fetch origin
@@ -154,14 +172,7 @@ module Flow
           git submodule update; true`
       end
 
-      protected
-      def configured_dependent_repos
-        config['dependent_repos'].to_a
-      end
 
-      def configured_related_repos
-        config['related_repos']
-      end
 
       def client
         @__octokit_client__ ||= begin

@@ -145,9 +145,7 @@ module Flow
           repository.clone_into(where)
           repository.update_dependent(where,submodule_path, branch)
           repository.create_pull_request(where,submodule_path, branch, title)
-          true
         end
-
       end
 
       def merge

@@ -28,9 +28,7 @@ module Flow
 
       def new_pr(request)
         pr = pull_request(request)
-        if pr != false
-          pr.treat_dependent
-        end
+        pr.treat_dependent if pr
       end
 
       protected

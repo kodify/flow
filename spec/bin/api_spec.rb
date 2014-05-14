@@ -124,10 +124,10 @@ describe 'The FlowAPI' do
     let!(:number)       { 100 }
     let!(:pull_request) { double('pull_request',
                                  id: 1,
-        head: pull_request_head,
-            title: 'hello',
-        number: number,
-            rels: { comments: comments_getter } ) }
+                                 head: pull_request_head,
+                                 title: 'hello',
+                                 number: number,
+                                 rels: { comments: comments_getter } ) }
     let!(:branch)             { 'name' }
     let!(:pull_request_head)  { double('head', attrs: { sha: sha }, label: "branch:#{branch}") }
     let!(:sha)                { 'xxxx' }
@@ -172,26 +172,23 @@ describe 'The FlowAPI' do
       describe 'And NOT dependent repos related' do
         let!(:pull_request) {Flow::Workflow::PullRequest.new(Flow::Workflow::Repo.new(repo),{})}
         before do
-          Flow::Workflow::Github.any_instance.stub(:pull_request_from_request).and_return(pull_request)
+          Flow::Workflow::Github.any_instance.stub(:pull_request_object_from_pull_request).and_return(pull_request)
         end
         it 'should NOT create a pull request to related repository' do
-          expect_any_instance_of(Flow::Workflow::PullRequest).to receive(:treat_dependent)
-          expect_any_instance_of(Flow::Workflow::Repo).not_to receive(:create_pull_request)
+          expect_any_instance_of(Flow::Workflow::Github).not_to receive(:treat_dependent)
         end
       end
       describe 'And some dependent repos related' do
+        let!(:repo_to_use) { Flow::Workflow::Repo.new(repo) }
         before do
-          repoToUse = Flow::Workflow::Repo.new(repo)
-          pull_request = Flow::Workflow::PullRequest.new(repoToUse,{})
-          Flow::Workflow::Github.any_instance.stub(:pull_request_from_request).and_return(pull_request)
+          pull_request = Flow::Workflow::PullRequest.new(repo_to_use,{})
+          Flow::Workflow::Github.any_instance.stub(:pull_request_object_from_pull_request).and_return(pull_request)
 
           config['projects'].values.first['source_control']['github']['dependent_repos'] = [{'name' => "kodify/repo1", 'path' => "/submodule_path"}]
         end
 
         it 'should create a pull request to related repository' do
-          #expect_any_instance_of(Flow::Workflow::PullRequest).to receive(:treat_dependent)
-          expect_any_instance_of(Flow::Workflow::Repo).to receive(:clone_into)
-          expect_any_instance_of(Flow::Workflow::Repo).to receive(:create_pull_request)
+          expect_any_instance_of(Flow::Workflow::Github).to receive(:treat_dependent)
         end
       end
 

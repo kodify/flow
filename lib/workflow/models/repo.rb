@@ -42,6 +42,11 @@ module Flow
         scm.create_pull_request(where,submodule_path,branch,comment, project_name)
       end
 
+      def clone_into(path)
+          scm.clone_project_into(repo_url, path, project_name)
+      end
+
+
       protected
 
       def project_name

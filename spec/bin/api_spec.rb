@@ -163,11 +163,7 @@ describe 'The FlowAPI' do
       let!(:event)    { 'pull_request' }
       let!(:payload)  { mock_template('github', 'pull_request', ':repo_name:' => repo, ':pull_request_number:' => number.to_s, ':sha:' => sha) }
       before do
-        Flow::Workflow::Github.any_instance.stub(:clean_repo)
-        Flow::Workflow::Github.any_instance.stub(:put_branch_on_path)
-        Flow::Workflow::Github.any_instance.stub(:create_branch_on_path)
-        Flow::Workflow::Github.any_instance.stub(:create_pull_request)
-        Flow::Workflow::Github.any_instance.stub(:clone_project_into)
+        Flow::Workflow::Github.any_instance.stub(:update_dependent)
       end
       describe 'And NOT dependent repos related' do
         let!(:pull_request) {Flow::Workflow::PullRequest.new(Flow::Workflow::Repo.new(repo),{})}
@@ -175,7 +171,7 @@ describe 'The FlowAPI' do
           Flow::Workflow::Github.any_instance.stub(:pull_request_object_from_pull_request).and_return(pull_request)
         end
         it 'should NOT create a pull request to related repository' do
-          expect_any_instance_of(Flow::Workflow::Github).not_to receive(:treat_dependent)
+          expect_any_instance_of(Flow::Workflow::Github).not_to receive(:update_dependent)
         end
       end
       describe 'And some dependent repos related' do
@@ -188,7 +184,7 @@ describe 'The FlowAPI' do
         end
 
         it 'should create a pull request to related repository' do
-          expect_any_instance_of(Flow::Workflow::Github).to receive(:treat_dependent)
+          expect_any_instance_of(Flow::Workflow::Github).to receive(:update_dependent)
         end
       end
 

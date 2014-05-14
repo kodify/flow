@@ -27,7 +27,7 @@ module Flow
       end
 
       def new_pr(request)
-        pr = pull_request(request)
+        pr = pull_request_from_pull_request(request)
         pr.treat_dependent if pr
       end
 

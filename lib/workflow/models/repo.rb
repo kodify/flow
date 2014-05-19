@@ -35,7 +35,7 @@ module Flow
       end
 
       def update_dependent(where,submodule_path, branch)
-        scm.update_dependent(where, submodule_path,branch)
+        scm.update_dependent(where, submodule_path,branch, project_name)
       end
 
       def create_pull_request(where, submodule_path, branch, comment)

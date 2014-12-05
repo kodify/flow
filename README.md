@@ -42,12 +42,23 @@ You need to rename the config/parameters.yml.tpl to config/parameters.yml, and f
 
 ###Run it
 
-You will probably want this on a cronjob
-```sh
-./bin/kod flow 'my/repo'
-```
+You should get flow running on a public ip/address on port 80 (otherwhise jira webhooks won't work), to start it just use rackup
 
-###Configure Jira webhooks
+```sh
+rackup -D
+```
+* -D is to run it as a daemon
+
+###Configure Github WebHooks
+
+Go to your github repo and configure a new WebHook pointing to flow with this info:
+
+- URL: "http://your_address_or_ip/payload?token=YOUR_TOKEN"
+- EVENTS: Issue comment, Pull Request review comment, Push, Status
+
+Github webhooks: https://help.github.com/articles/about-webhooks/
+
+###Configure Jira WebHooks
 
 [Here][] you have a good explanation of what are Jira webhooks, BTW you should configure them as follows:
 

@@ -34,7 +34,7 @@ module Flow
       end
 
       def branch_to_id(branch)
-        branch.match('([a-zA-Z]{2,3})-([0-9]{1,})').to_s
+        branch.match('([a-zA-Z]{2,4})-([0-9]{1,})').to_s
       end
 
       def unassigned_issues_by_status(status)

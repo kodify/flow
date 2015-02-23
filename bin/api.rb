@@ -44,12 +44,25 @@ post '/pr/:issue/ok' do
   move_pr :ship_it!
 end
 
+post '/issue/:issue/merged' do
+  move_ticket_to_done(params[:issue])
+end
+
 get '/ping' do
   'its alive'
 end
 
 
 helpers do
+
+  def move_ticket_to_done
+    repos.each do |repo_name|
+      if (pr = pull_request(repo_name, params[:issue]))
+        pr.to_done!
+        break
+      end
+    end
+  end
 
   def move_pr(method)
     status 404

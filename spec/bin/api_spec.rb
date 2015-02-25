@@ -300,12 +300,6 @@ describe 'The FlowAPI' do
             it 'should merge the pull request' do
               expect_any_instance_of(Octokit::Client).to receive(:merge_pull_request).with(repo, number, "#{branch} #UAT-OK - PR #{number} merged")
             end
-            it 'should remove the pull request related branch' do
-              expect_any_instance_of(Octokit::Client).to receive(:delete_ref).with(repo, "heads/#{branch}")
-            end
-            it 'should move issue to done on the issue tracker' do
-              expect_any_instance_of(Flow::Workflow::DummyIt).to receive(:do_move).with(:done, id)
-            end
             it 'should notify branch is merged' do
               expect_any_instance_of(Flow::Workflow::DummyNotifier).to receive(:say_merged)
             end
@@ -405,9 +399,6 @@ describe 'The FlowAPI' do
           describe 'when pull request is success' do
             it 'should merge the pull request' do
               expect_any_instance_of(Octokit::Client).to receive(:merge_pull_request).with(repo, number, "#{branch} #UAT-OK - PR #{number} merged")
-            end
-            it 'should remove the pull request related branch' do
-              expect_any_instance_of(Octokit::Client).to receive(:delete_ref).with(repo, "heads/#{branch}")
             end
             it 'should move issue to done on the issue tracker' do
               expect_any_instance_of(Flow::Workflow::DummyIt).to receive(:do_move).with(:done, id)

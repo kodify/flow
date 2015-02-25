@@ -45,7 +45,7 @@ post '/pr/:issue/ok' do
 end
 
 post '/issue/:issue/merged' do
-  move_ticket_to_done(params[:issue])
+  move_ticket_to_done
 end
 
 get '/ping' do

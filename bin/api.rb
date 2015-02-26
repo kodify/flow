@@ -79,7 +79,9 @@ helpers do
 
   def pull_request(repo_name, issue_key)
     repo = Flow::Workflow::Repo.new(repo_name)
-    repo.pull_request_by_name(issue_key)
+    pr = repo.pull_request_by_name(issue_key)
+    pr = repo.pull_request_by_name_closed(issue_key) if !pr
+    pr
   end
 
   def repos

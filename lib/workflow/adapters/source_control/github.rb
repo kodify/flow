@@ -38,7 +38,7 @@ module Flow
       end
 
       def closed_pull_requests(repo)
-        client.pull_requests(repo.name, :state => 'closed' ).map do |pull|
+        client.pull_requests(repo.name, 'closed' ).map do |pull|
           new_pull_request repo, pull
         end
       end

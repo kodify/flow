@@ -27,6 +27,7 @@ describe 'The FlowAPI' do
   describe 'issue tracker webhooks' do
     before do
       Flow::Workflow::Repo.any_instance.stub(:pull_request_by_name).and_return(pr)
+      Flow::Workflow::Repo.any_instance.stub(:pull_request_by_name_closed).and_return(pr)
     end
 
     describe "/pr/ok" do
@@ -399,9 +400,6 @@ describe 'The FlowAPI' do
           describe 'when pull request is success' do
             it 'should merge the pull request' do
               expect_any_instance_of(Octokit::Client).to receive(:merge_pull_request).with(repo, number, "#{branch} #UAT-OK - PR #{number} merged")
-            end
-            it 'should move issue to done on the issue tracker' do
-              expect_any_instance_of(Flow::Workflow::DummyIt).to receive(:do_move).with(:done, id)
             end
             it 'should notify branch is merged' do
               expect_any_instance_of(Flow::Workflow::DummyNotifier).to receive(:say_merged)

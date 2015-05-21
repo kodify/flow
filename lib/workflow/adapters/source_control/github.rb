@@ -200,7 +200,7 @@ module Flow
                                         title:      pull.title,
                                         number:     pull.number,
                                         branch:     pull.head.label.split(':')[1],
-                                        comments:   pull.rels[:comments].get.data,
+                                        comments:   pull.rels[:comments].get.data
         )
       end
 

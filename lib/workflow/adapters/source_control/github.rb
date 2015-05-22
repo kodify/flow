@@ -37,6 +37,12 @@ module Flow
         end
       end
 
+      def closed_pull_requests(repo)
+        client.pull_requests(repo.name, 'closed' ).map do |pull|
+          new_pull_request repo, pull
+        end
+      end
+
       def issues(name)
         client.issues name
       end
@@ -194,7 +200,7 @@ module Flow
                                         title:      pull.title,
                                         number:     pull.number,
                                         branch:     pull.head.label.split(':')[1],
-                                        comments:   pull.rels[:comments].get.data,
+                                        comments:   pull.rels[:comments].get.data
         )
       end
 

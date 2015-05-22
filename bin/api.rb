@@ -45,7 +45,7 @@ post '/pr/:issue/ok' do
 end
 
 post '/issue/:issue/merged' do
-  move_ticket_to_done(params[:issue])
+  move_ticket_to_done
 end
 
 get '/ping' do
@@ -79,7 +79,9 @@ helpers do
 
   def pull_request(repo_name, issue_key)
     repo = Flow::Workflow::Repo.new(repo_name)
-    repo.pull_request_by_name(issue_key)
+    pr = repo.pull_request_by_name(issue_key)
+    pr = repo.pull_request_by_name_closed(issue_key) if !pr
+    pr
   end
 
   def repos

@@ -119,6 +119,7 @@ module Flow
         if issue_tracker_id
           notifier.say_moved issue_tracker_id, 'done'
           issue_tracker.do_move :done, issue_tracker_id
+          delete_branch
         end
       end
 
@@ -193,8 +194,6 @@ module Flow
         if merge == false
           require_rebase
         else
-          delete_branch
-          to_done!
           notifier.say_merged issue_tracker_id, branch
         end
       end

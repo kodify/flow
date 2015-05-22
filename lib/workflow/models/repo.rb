@@ -16,6 +16,10 @@ module Flow
       def pull_request_by_name(name)
         pulls.find { |pull| pull.issue_tracker_id.to_s == name }
       end
+
+      def pull_request_by_name_closed(name)
+        closed_pulls.find { |pull| pull.issue_tracker_id.to_s == name }
+      end
       
       def issue_exists(issue_name)
         issues.any? { |issue| issue.title.include? issue_name }
@@ -60,6 +64,10 @@ module Flow
 
       def pulls
         @__pull_requests__ ||= scm.pull_requests self
+      end
+
+      def closed_pulls
+        @__closed_pull_requests__ ||= scm.closed_pull_requests self
       end
 
       def issues

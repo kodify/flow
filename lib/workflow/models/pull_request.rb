@@ -23,8 +23,8 @@ module Flow
           return :not_reviewed                if !reviewed?
           return :uat_ko                      if uat_ko?
           return :not_reviewed_on_all_repos   if !(!standalone.nil? or all_repos_on_status?(:not_uat))
-          return :not_uat                     if !uat?
           return :not_success_on_all_repos    if !(!standalone.nil? or all_repos_on_status?(:success))
+          return :not_uat                     if !uat?
           :success
         end
       end

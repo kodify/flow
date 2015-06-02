@@ -12,7 +12,6 @@ module Flow
 
       def new_comment(request)
         comment = scm.comment_from_request request
-        return unless comment.modifies_workflow?
         return comment.pull_request.to_in_progress! if comment.uat_ko?
 
         comment.pull_request.move_away!
